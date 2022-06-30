@@ -1,19 +1,16 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { Card, CardContent, Stack, Typography } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
-import Head from "next/head";
-import Link from "next/link";
-import Account from "../components/Account";
-import ETHBalance from "../components/ETHBalance";
-import TokenBalance from "../components/TokenBalance";
-import useEagerConnect from "../hooks/useEagerConnect";
-import Typography from '@mui/material/Typography';
+
+import useEagerConnect from "~/hooks/useEagerConnect";
 import useICVCMGovernor from "../hooks/useICVCMGovernor";
-import { useCallback, useEffect, useState } from "react";
 import useICVCMToken from "../hooks/useICVCMToken";
-import { Button, Card, CardContent, Modal, Stack, TextField } from "@mui/material";
 import { Proposal } from "~/@types";
 import ContractAddress from '~/contract.json';
-import ProposeButton from "~/components/ProposeButton";
+import { Account, ETHBalance, TokenBalance } from "~/components/accounts";
+import { ProposeButton } from "~/components/proposals";
 import { getProposals } from "~/services/ICVCMGovernor";
+import { Navbar } from "~/components/common";
 
 function Home() {
   const { account, library } = useWeb3React();
@@ -26,13 +23,13 @@ function Home() {
   const ICVCMToken = useICVCMToken();
 
   const loadEvents = useCallback(async () => {
-    if (!ICVCMGovernor || !ICVCMToken || !account) {
+    if (!ICVCMGovernor || !account) {
       return;
     }
 
     const events = await getProposals(ICVCMGovernor);
     setProposals(events);
-  }, [ICVCMGovernor, ICVCMToken, account, getProposals]);
+  }, [ICVCMGovernor, account]);
 
 
   useEffect(() => {
@@ -43,16 +40,10 @@ function Home() {
 
   return (
     <div>
-      <Head>
-        <title>next-web3-boilerplate</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <Navbar />
 
       <header>
         <nav>
-          <Link href="/">
-            <a>ICVCM Governance</a>
-          </Link>
 
           <Account triedToEagerConnect={triedToEagerConnect} />
         </nav>
