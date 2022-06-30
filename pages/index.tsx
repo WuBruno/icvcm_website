@@ -37,7 +37,7 @@ function Home() {
 
   const triedToEagerConnect = useEagerConnect();
 
-  const ICVCMGovernor = useICVCMGovernor();
+  const { ICVCMGovernor, propose, getProposals } = useICVCMGovernor();
   const ICVCMToken = useICVCMToken()
 
   const loadEvents = useCallback(async () => {
@@ -52,7 +52,7 @@ function Home() {
   const submitProposal = async () => {
     setOpen(false)
     setLoading(true)
-    const proposalId = await propose(ICVCMGovernor, ICVCMToken, account, value)
+    const proposalId = await propose(ICVCMToken, account, value)
     console.log(proposalId);
     setLoading(false)
   }
