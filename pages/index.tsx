@@ -11,8 +11,9 @@ import { useCallback, useEffect, useState } from "react";
 import useICVCMToken from "../hooks/useICVCMToken";
 import { Button, Card, CardContent, Modal, Stack, TextField } from "@mui/material";
 import { Proposal } from "~/@types";
-import ContractAddress from '~/contract';
+import ContractAddress from '~/contract.json';
 import ProposeButton from "~/components/ProposeButton";
+import { getProposals } from "~/services/ICVCMGovernor";
 
 function Home() {
   const { account, library } = useWeb3React();
@@ -29,7 +30,7 @@ function Home() {
       return;
     }
 
-    const events = await getProposals();
+    const events = await getProposals(ICVCMGovernor);
     setProposals(events);
   }, [ICVCMGovernor, ICVCMToken, account, getProposals]);
 
@@ -68,7 +69,7 @@ function Home() {
             <section>
               <ETHBalance />
 
-              <TokenBalance tokenAddress={ContractAddress} symbol="ICVCM" />
+              <TokenBalance tokenAddress={ContractAddress.ICVCMToken} symbol="ICVCM" />
             </section>
           )}
 
