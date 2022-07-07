@@ -2,7 +2,7 @@ import { Button, Modal, Stack, TextField, Typography } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
 import { useState } from "react";
 import { useAsync, useICVCMGovernor, useICVCMToken } from "~/hooks";
-import { propose } from "~/services/ICVCMGovernor";
+import { propose } from "~/services/governor";
 
 const style = {
   position: 'absolute' as 'absolute',

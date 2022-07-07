@@ -1,3 +1,4 @@
+import { mutate } from "swr";
 import { Proposal, ProposalState } from "~/@types";
 import { ICVCMGovernor, ICVCMToken } from "~/contracts/types";
 
@@ -23,6 +24,8 @@ export const propose = async (
   const proposeReceipt = await proposalTx.wait(1);
   const proposalId = proposeReceipt.events![0].args!.proposalId;
 
+  await mutate("getProposals");
+
   return proposalId;
 };
 
@@ -34,10 +37,10 @@ export const getProposals = async (
 
   return Promise.all(
     proposals.map(async ({ args }) => {
-      const proposalId = args[0].toString();
+      const proposalId = args.proposalId.toString();
       return {
         proposalId: proposalId,
-        description: args[8],
+        description: args.description,
         state: await getProposalState(ICVCMGovernor, proposalId),
       };
     })

@@ -202,13 +202,13 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "delegatee",
+        "name": "",
         "type": "address"
       }
     ],
     "name": "delegate",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -320,6 +320,25 @@
       }
     ],
     "name": "getPastVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getTokenId",
     "outputs": [
       {
         "internalType": "uint256",
@@ -453,7 +472,13 @@
       }
     ],
     "name": "safeMint",
-    "outputs": [],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
