@@ -6,6 +6,7 @@ import ContractAddress from '~/contract.json';
 import { ETHBalance, TokenBalance } from "~/components/accounts";
 import { ProposalList, ProposeButton } from "~/components/proposals";
 import { Navbar } from "~/components/common";
+import AccountInfo from "~/components/accounts/AccountInfo";
 
 function Home() {
   const { account, library } = useWeb3React();
@@ -29,6 +30,8 @@ function Home() {
             <TokenBalance tokenAddress={ContractAddress.ICVCMToken} symbol="ICVCM" />
           </section>
         )}
+
+        <AccountInfo />
 
         <ProposeButton />
 
