@@ -18,7 +18,7 @@ const ProposalList = (props: Props) => {
 
   return (
     <div>
-      <Typography variant="h6">
+      <Typography variant="h6" sx={{ marginTop: 4 }}>
         Proposals
       </Typography>
 
