@@ -7,6 +7,7 @@ import { ETHBalance, TokenBalance } from "~/components/accounts";
 import { ActiveProposalList, CompletedProposalList, ProposeButton } from "~/components/proposals";
 import { Navbar } from "~/components/common";
 import AccountInfo from "~/components/accounts/AccountInfo";
+import { ConstitutionInfo } from "~/components/constitution";
 
 function Home() {
   const { account, library } = useWeb3React();
@@ -34,6 +35,8 @@ function Home() {
         <AccountInfo />
 
         <ProposeButton />
+
+        <ConstitutionInfo />
 
         <ActiveProposalList />
 

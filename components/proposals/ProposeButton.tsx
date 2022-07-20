@@ -1,5 +1,6 @@
 import { Button, Modal, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useState } from "react";
+import { EditStrategy } from ".";
 import EditPrinciple from "./EditPrinciple";
 
 const style = {
@@ -23,7 +24,7 @@ enum ProposalType {
 
 const ProposeButton = () => {
   const [open, setOpen] = useState(false);
-  const [proposalType, setProposalType] = useState<ProposalType>();
+  const [proposalType, setProposalType] = useState<ProposalType>(ProposalType.EditPrinciple);
 
 
 
@@ -35,22 +36,28 @@ const ProposeButton = () => {
   };
 
   const ProposalComponent = () => {
-    if (proposalType === ProposalType.EditPrinciple) {
-      return <EditPrinciple setOpen={setOpen} />;
-    }
+    switch (proposalType) {
+      case ProposalType.EditPrinciple:
+        return <EditPrinciple setOpen={setOpen} />;
 
-    return null;
+      case ProposalType.EditStrategy:
+        return <EditStrategy setOpen={setOpen} />;
+
+      default:
+        return null;
+    }
   };
 
 
   return <div>
-    <Button variant="contained" onClick={() => setOpen(true)}>Create Proposal</Button>
+    <Button variant="contained" sx={{ marginY: 2 }} onClick={() => setOpen(true)}>Create Proposal</Button>
 
     <Modal open={open} onClose={() => setOpen(false)}>
       <Stack spacing={2} sx={style}>
         <Typography variant="h5">
           Create Proposal
         </Typography>
+
         <ToggleButtonGroup
           color="primary"
           size="small"
@@ -63,6 +70,7 @@ const ProposeButton = () => {
           <ToggleButton value={ProposalType.AddMember}>New Member</ToggleButton>
           <ToggleButton value={ProposalType.RemoveMember}>Remove Member</ToggleButton>
         </ToggleButtonGroup>
+
         <ProposalComponent />
       </Stack>
     </Modal>

@@ -35,11 +35,28 @@ export const proposePrinciple = async (
   newPrinciples: string,
   description: string
 ) => {
-  console.log(newPrinciples, description);
-
   const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
     "setPrinciples",
     [newPrinciples]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMConstitution.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeStrategy = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMConstitution: ICVCMConstitution,
+  newStrategies: string,
+  description: string
+) => {
+  const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
+    "setStrategies",
+    [newStrategies]
   );
 
   return propose(
