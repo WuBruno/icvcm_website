@@ -1,5 +1,5 @@
 import {
-  Box,
+  Divider,
   List,
   ListItem,
   ListSubheader,
@@ -27,57 +27,59 @@ function MembersList({}: Props) {
   );
 
   return (
-    <Box>
-      <List>
-        <ListSubheader>
-          <Typography variant="h6">Directors</Typography>
-        </ListSubheader>
-        {directors?.map((member) => (
-          <ListItem key={member.memberAddress}>
-            <Stack>
-              <Typography>
-                {ethers.utils.parseBytes32String(member.name)}
-              </Typography>
-              <Typography variant="caption" color="GrayText">
-                {member.memberAddress}
-              </Typography>
-            </Stack>
-          </ListItem>
-        ))}
+    <List>
+      <ListSubheader>
+        <Typography variant="h6">Directors</Typography>
+      </ListSubheader>
+      {directors?.map((member) => (
+        <ListItem key={member.memberAddress}>
+          <Stack>
+            <Typography>
+              {ethers.utils.parseBytes32String(member.name)}
+            </Typography>
+            <Typography variant="caption" color="GrayText">
+              {member.memberAddress}
+            </Typography>
+          </Stack>
+        </ListItem>
+      ))}
 
-        <ListSubheader>
-          <Typography variant="h6">Expert Panel</Typography>
-        </ListSubheader>
-        {experts?.map((member) => (
-          <ListItem key={member.memberAddress}>
-            <Stack>
-              <Typography>
-                {ethers.utils.parseBytes32String(member.name)}
-              </Typography>
-              <Typography variant="caption" color="GrayText">
-                {member.memberAddress}
-              </Typography>
-            </Stack>
-          </ListItem>
-        ))}
+      <Divider />
 
-        <ListSubheader>
-          <Typography variant="h6">Executive Secretariat</Typography>
-        </ListSubheader>
-        {secretariat?.map((member) => (
-          <ListItem key={member.memberAddress}>
-            <Stack>
-              <Typography>
-                {ethers.utils.parseBytes32String(member.name)}
-              </Typography>
-              <Typography variant="caption" color="GrayText">
-                {member.memberAddress}
-              </Typography>
-            </Stack>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+      <ListSubheader sx={{ marginTop: 1 }}>
+        <Typography variant="h6">Expert Panel</Typography>
+      </ListSubheader>
+      {experts?.map((member) => (
+        <ListItem key={member.memberAddress}>
+          <Stack>
+            <Typography>
+              {ethers.utils.parseBytes32String(member.name)}
+            </Typography>
+            <Typography variant="caption" color="GrayText">
+              {member.memberAddress}
+            </Typography>
+          </Stack>
+        </ListItem>
+      ))}
+
+      <Divider />
+
+      <ListSubheader sx={{ marginTop: 1 }}>
+        <Typography variant="h6">Executive Secretariat</Typography>
+      </ListSubheader>
+      {secretariat?.map((member) => (
+        <ListItem key={member.memberAddress}>
+          <Stack>
+            <Typography>
+              {ethers.utils.parseBytes32String(member.name)}
+            </Typography>
+            <Typography variant="caption" color="GrayText">
+              {member.memberAddress}
+            </Typography>
+          </Stack>
+        </ListItem>
+      ))}
+    </List>
   );
 }
 
