@@ -64,7 +64,9 @@ const Account = ({ triedToEagerConnect }: AccountProps) => {
             Connect to Wallet
           </Button>
         ) : (
-          <Button color="inherit" onClick={startOnboarding}>Install Metamask</Button>
+          <Button color="inherit" onClick={startOnboarding}>
+            Install Metamask
+          </Button>
         )}
       </div>
     );

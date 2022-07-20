@@ -1,23 +1,40 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { useWeb3React } from '@web3-react/core';
-import React from 'react';
-import { ProposalState } from '~/@types';
-import { useICVCMGovernor } from '~/hooks';
-import { getProposals } from '~/services/proposals';
-import { VoteButton } from '~/components/vote';
-import useSWR from 'swr';
-import ExecuteProposalButton from './ExecuteProposalButton';
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import { useWeb3React } from "@web3-react/core";
+import React from "react";
+import { ProposalState } from "~/@types";
+import { useICVCMGovernor } from "~/hooks";
+import { getProposals } from "~/services/proposals";
+import { VoteButton } from "~/components/vote";
+import useSWR from "swr";
+import ExecuteProposalButton from "./ExecuteProposalButton";
 
-type Props = {}
+type Props = {};
 
 const CompletedProposalList = (props: Props) => {
   const { account } = useWeb3React();
   const ICVCMGovernor = useICVCMGovernor();
   const shouldFetch = !!account;
 
-  const { data: proposals } = useSWR(shouldFetch ? 'getProposals' : null, async () => getProposals(ICVCMGovernor));
+  const { data: proposals } = useSWR(
+    shouldFetch ? "getProposals" : null,
+    async () => getProposals(ICVCMGovernor)
+  );
 
-  const completedProposals = proposals && proposals.filter((proposal) => ![ProposalState.Active, ProposalState.Pending].includes(proposal.state));
+  const completedProposals =
+    proposals &&
+    proposals.filter(
+      (proposal) =>
+        ![ProposalState.Active, ProposalState.Pending].includes(proposal.state)
+    );
 
   return (
     <div>
@@ -35,24 +52,27 @@ const CompletedProposalList = (props: Props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {completedProposals && completedProposals.map((proposal) => (
-              <TableRow
-                key={proposal.proposalId}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {proposal.description}
-                </TableCell>
-                <TableCell align="right">{ProposalState[proposal.state]}</TableCell>
-                <TableCell align="right">
-                  <ExecuteProposalButton proposal={proposal} />
-                </TableCell>
-              </TableRow>
-            ))}
+            {completedProposals &&
+              completedProposals.map((proposal) => (
+                <TableRow
+                  key={proposal.proposalId}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {proposal.description}
+                  </TableCell>
+                  <TableCell align="right">
+                    {ProposalState[proposal.state]}
+                  </TableCell>
+                  <TableCell align="right">
+                    <ExecuteProposalButton proposal={proposal} />
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </div >
+    </div>
   );
 };
 
