@@ -20,7 +20,7 @@ function Home() {
     <div>
       <Navbar />
 
-      <Container maxWidth="md" sx={{ marginTop: 5 }}>
+      <Container maxWidth="md" sx={{ marginTop: 5, marginBottom: 20 }}>
         <Typography color="textPrimary" variant="h2" textAlign="center">
           ICVCM Governance
         </Typography>

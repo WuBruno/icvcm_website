@@ -1,3 +1,4 @@
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
   AccordionDetails,
@@ -5,11 +6,10 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import React from "react";
 import useSWR from "swr";
 import { useICVCMConstitution } from "~/hooks";
 import { getPrinciples, getStrategies } from "~/services/constitution";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { MembersList } from "../members";
 
 type Props = {};
 
@@ -26,7 +26,7 @@ function ConstitutionInfo({}: Props) {
 
   return (
     <Box>
-      <Typography variant="h6">Constitution</Typography>
+      <Typography variant="h5">Constitution</Typography>
 
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -54,10 +54,7 @@ function ConstitutionInfo({}: Props) {
         </AccordionSummary>
 
         <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
+          <MembersList />
         </AccordionDetails>
       </Accordion>
     </Box>

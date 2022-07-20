@@ -85,6 +85,36 @@
   },
   {
     "inputs": [],
+    "name": "getMembers",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum Role",
+            "name": "role",
+            "type": "uint8"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "name",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "memberAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct MemberOutput[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "owner",
     "outputs": [
       {

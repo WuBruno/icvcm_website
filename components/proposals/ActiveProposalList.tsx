@@ -9,12 +9,11 @@ import {
   Typography,
 } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
-import React from "react";
+import useSWR from "swr";
 import { ProposalState } from "~/@types";
+import { VoteButton } from "~/components/vote";
 import { useICVCMGovernor } from "~/hooks";
 import { getProposals } from "~/services/proposals";
-import { VoteButton } from "~/components/vote";
-import useSWR from "swr";
 
 type Props = {};
 
@@ -36,7 +35,7 @@ const ActiveProposalList = (props: Props) => {
 
   return (
     <div>
-      <Typography variant="h6" sx={{ marginTop: 4 }}>
+      <Typography variant="h5" sx={{ marginTop: 4 }}>
         Active Proposals
       </Typography>
 

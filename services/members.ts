@@ -6,3 +6,7 @@ export const getMember = async (
 ) => {
   return ICVCMRoles.getMember(memberAddress);
 };
+
+export const getMembers = async (ICVCMRoles: ICVCMRoles) => {
+  return ICVCMRoles.getMembers();
+};

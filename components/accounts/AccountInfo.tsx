@@ -5,7 +5,7 @@ import React from "react";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
 import { useICVCMRoles } from "~/hooks";
-import { getMember } from "~/services/account";
+import { getMember } from "~/services/members";
 
 type Props = {};
 
