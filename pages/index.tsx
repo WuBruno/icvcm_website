@@ -1,17 +1,15 @@
-import React from "react";
 import { Container, Typography } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
 
-import ContractAddress from "~/contract.json";
-import { ETHBalance, TokenBalance } from "~/components/accounts";
+import { AccountInfo, ETHBalance, TokenBalance } from "~/components/accounts";
+import { Navbar } from "~/components/common";
+import { ConstitutionInfo } from "~/components/constitution";
 import {
   ActiveProposalList,
   CompletedProposalList,
   ProposeButton,
 } from "~/components/proposals";
-import { Navbar } from "~/components/common";
-import AccountInfo from "~/components/accounts/AccountInfo";
-import { ConstitutionInfo } from "~/components/constitution";
+import ContractAddress from "~/contract.json";
 
 function Home() {
   const { account, library } = useWeb3React();
