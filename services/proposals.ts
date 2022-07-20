@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
 import { mutate } from "swr";
 import { Proposal, ProposalState } from "~/@types";
+import { Roles } from "~/@types/Roles";
 import {
   ICVCMConstitution,
   ICVCMGovernor,
-  ICVCMToken,
+  ICVCMRoles,
 } from "~/contracts/types";
 
 export const propose = async (
@@ -62,6 +63,27 @@ export const proposeStrategy = async (
   return propose(
     ICVCMGovernor,
     ICVCMConstitution.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeAddMember = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles,
+  description: string,
+  name: string,
+  role: Roles,
+  address: string
+) => {
+  const encodedFunctionCall = ICVCMRoles.interface.encodeFunctionData(
+    "addMember",
+    [address, role, ethers.utils.formatBytes32String(name)]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMRoles.address,
     encodedFunctionCall,
     description
   );

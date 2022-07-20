@@ -30,7 +30,7 @@ function ConstitutionInfo({}: Props) {
 
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography paragraph>Carbon Credit Principles</Typography>
+          <Typography>Carbon Credit Principles</Typography>
         </AccordionSummary>
 
         <AccordionDetails>

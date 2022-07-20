@@ -2,13 +2,13 @@ import {
   Button,
   Modal,
   Stack,
-  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { EditStrategy } from ".";
+import AddMember from "./AddMember";
 import EditPrinciple from "./EditPrinciple";
 
 const style = {
@@ -50,6 +50,9 @@ const ProposeButton = () => {
 
       case ProposalType.EditStrategy:
         return <EditStrategy setOpen={setOpen} />;
+
+      case ProposalType.AddMember:
+        return <AddMember setOpen={setOpen} />;
 
       default:
         return null;
