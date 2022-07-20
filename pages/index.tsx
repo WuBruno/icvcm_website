@@ -4,7 +4,7 @@ import { useWeb3React } from "@web3-react/core";
 
 import ContractAddress from '~/contract.json';
 import { ETHBalance, TokenBalance } from "~/components/accounts";
-import { ProposalList, ProposeButton } from "~/components/proposals";
+import { ActiveProposalList, CompletedProposalList, ProposeButton } from "~/components/proposals";
 import { Navbar } from "~/components/common";
 import AccountInfo from "~/components/accounts/AccountInfo";
 
@@ -35,7 +35,9 @@ function Home() {
 
         <ProposeButton />
 
-        <ProposalList />
+        <ActiveProposalList />
+
+        <CompletedProposalList />
 
       </Container>
 

@@ -1,8 +1,6 @@
-import { Button, Modal, Stack, TextField, Typography } from "@mui/material";
-import { useWeb3React } from "@web3-react/core";
+import { Button, Modal, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useState } from "react";
-import { useAsync, useICVCMGovernor, useICVCMToken } from "~/hooks";
-import { propose } from "~/services/governor";
+import EditPrinciple from "./EditPrinciple";
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -16,23 +14,34 @@ const style = {
   p: 4,
 };
 
+enum ProposalType {
+  EditPrinciple,
+  EditStrategy,
+  AddMember,
+  RemoveMember
+}
+
 const ProposeButton = () => {
   const [open, setOpen] = useState(false);
-  const { account } = useWeb3React();
-  const [_, submit] = useAsync(submitProposal);
-  const ICVCMGovernor = useICVCMGovernor();
-  const ICVCMToken = useICVCMToken();
-  const [value, setValue] = useState('Controlled');
+  const [proposalType, setProposalType] = useState<ProposalType>();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+
+
+  const handleChangeProposalType = (
+    event: React.MouseEvent<HTMLElement>,
+    _proposalType: ProposalType,
+  ) => {
+    setProposalType(_proposalType);
   };
 
-  async function submitProposal() {
-    setOpen(false);
-    const proposalId = await propose(ICVCMGovernor, ICVCMToken, account, value);
-    console.log(proposalId);
+  const ProposalComponent = () => {
+    if (proposalType === ProposalType.EditPrinciple) {
+      return <EditPrinciple setOpen={setOpen} />;
+    }
+
+    return null;
   };
+
 
   return <div>
     <Button variant="contained" onClick={() => setOpen(true)}>Create Proposal</Button>
@@ -42,8 +51,19 @@ const ProposeButton = () => {
         <Typography variant="h5">
           Create Proposal
         </Typography>
-        <TextField label="Description" multiline onChange={handleChange} />
-        <Button variant="contained" onClick={submit}>Propose</Button>
+        <ToggleButtonGroup
+          color="primary"
+          size="small"
+          value={proposalType}
+          exclusive
+          onChange={handleChangeProposalType}
+        >
+          <ToggleButton value={ProposalType.EditPrinciple}>Carbon Credit Principles</ToggleButton>
+          <ToggleButton value={ProposalType.EditStrategy}>Strategic Decisions</ToggleButton>
+          <ToggleButton value={ProposalType.AddMember}>New Member</ToggleButton>
+          <ToggleButton value={ProposalType.RemoveMember}>Remove Member</ToggleButton>
+        </ToggleButtonGroup>
+        <ProposalComponent />
       </Stack>
     </Modal>
   </div >;

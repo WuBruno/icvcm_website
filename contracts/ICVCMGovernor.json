@@ -5,6 +5,11 @@
         "internalType": "contract IVotes",
         "name": "_token",
         "type": "address"
+      },
+      {
+        "internalType": "contract ICVCMConstitution",
+        "name": "_constitution",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",

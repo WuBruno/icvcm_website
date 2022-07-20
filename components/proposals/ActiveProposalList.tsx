@@ -3,23 +3,26 @@ import { useWeb3React } from '@web3-react/core';
 import React from 'react';
 import { ProposalState } from '~/@types';
 import { useICVCMGovernor } from '~/hooks';
-import { getProposals } from '~/services/governor';
+import { getProposals } from '~/services/proposals';
 import { VoteButton } from '~/components/vote';
 import useSWR from 'swr';
 
 type Props = {}
 
-const ProposalList = (props: Props) => {
+const ActiveProposalList = (props: Props) => {
   const { account } = useWeb3React();
   const ICVCMGovernor = useICVCMGovernor();
   const shouldFetch = !!account;
 
   const { data: proposals } = useSWR(shouldFetch ? 'getProposals' : null, async () => getProposals(ICVCMGovernor));
 
+
+  const activeProposals = proposals && proposals.filter((proposal) => [ProposalState.Active, ProposalState.Pending].includes(proposal.state));
+
   return (
     <div>
       <Typography variant="h6" sx={{ marginTop: 4 }}>
-        Proposals
+        Active Proposals
       </Typography>
 
       <TableContainer component={Paper}>
@@ -32,7 +35,7 @@ const ProposalList = (props: Props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {proposals && proposals.map((proposal) => (
+            {activeProposals && activeProposals.map((proposal) => (
               <TableRow
                 key={proposal.proposalId}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -53,4 +56,4 @@ const ProposalList = (props: Props) => {
   );
 };
 
-export default ProposalList;
+export default ActiveProposalList;
