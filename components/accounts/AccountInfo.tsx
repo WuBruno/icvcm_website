@@ -1,7 +1,5 @@
 import { Stack, Typography } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
-import { ethers } from "ethers";
-import React from "react";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
 import { useICVCMRoles } from "~/hooks";
@@ -24,8 +22,7 @@ const AccountInfo = (props: Props) => {
   return (
     <Stack sx={{ marginY: 2 }}>
       <Typography>
-        <Typography fontWeight="bold">Name:</Typography>{" "}
-        {ethers.utils.parseBytes32String(data.name)}
+        <Typography fontWeight="bold">Name:</Typography> {data.name}
       </Typography>
       <Typography>
         <Typography fontWeight="bold">Role:</Typography> {Roles[data.role]}

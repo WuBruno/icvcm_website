@@ -12,7 +12,7 @@ import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { ProposalState } from "~/@types";
 import { VoteButton } from "~/components/vote";
-import { useICVCMGovernor } from "~/hooks";
+import { useICVCMGovernor, useICVCMRoles } from "~/hooks";
 import { getProposals } from "~/services/proposals";
 
 type Props = {};
@@ -20,11 +20,12 @@ type Props = {};
 const ActiveProposalList = (props: Props) => {
   const { account } = useWeb3React();
   const ICVCMGovernor = useICVCMGovernor();
+  const ICVCMRoles = useICVCMRoles();
   const shouldFetch = !!account;
 
   const { data: proposals } = useSWR(
     shouldFetch ? "getProposals" : null,
-    async () => getProposals(ICVCMGovernor)
+    async () => getProposals(ICVCMGovernor, ICVCMRoles)
   );
 
   const activeProposals =
@@ -44,6 +45,7 @@ const ActiveProposalList = (props: Props) => {
           <TableHead>
             <TableRow>
               <TableCell>Description</TableCell>
+              <TableCell align="right">Proposer</TableCell>
               <TableCell align="right">Status</TableCell>
               <TableCell align="right">Vote</TableCell>
             </TableRow>
@@ -53,11 +55,14 @@ const ActiveProposalList = (props: Props) => {
               activeProposals.map((proposal) => (
                 <TableRow
                   key={proposal.proposalId}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                  }}
                 >
                   <TableCell component="th" scope="row">
                     {proposal.description}
                   </TableCell>
+                  <TableCell align="right">{proposal.proposer.name}</TableCell>
                   <TableCell align="right">
                     {ProposalState[proposal.state]}
                   </TableCell>

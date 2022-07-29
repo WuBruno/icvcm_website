@@ -1,12 +1,11 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack } from "@mui/material";
+import styled from "@mui/styled-engine";
 import { useWeb3React } from "@web3-react/core";
 import { BigNumberish } from "ethers";
-import React from "react";
 import useSWR from "swr";
 import { VoteSupport } from "~/@types";
 import { useAsync, useICVCMGovernor } from "~/hooks";
 import { castVote, getVote } from "~/services/vote";
-import styled from "@mui/styled-engine";
 
 type Props = {
   proposalId: BigNumberish;

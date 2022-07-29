@@ -7,9 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { EditStrategy } from ".";
-import AddMember from "./AddMember";
-import EditPrinciple from "./EditPrinciple";
+import { AddMember, EditPrinciple, EditStrategy, RemoveMember } from ".";
 
 const style = {
   position: "absolute" as "absolute",
@@ -53,6 +51,9 @@ const ProposeButton = () => {
 
       case ProposalType.AddMember:
         return <AddMember setOpen={setOpen} />;
+
+      case ProposalType.RemoveMember:
+        return <RemoveMember setOpen={setOpen} />;
 
       default:
         return null;

@@ -7,6 +7,7 @@ import {
   ICVCMGovernor,
   ICVCMRoles,
 } from "~/contracts/types";
+import { getMember } from "./members";
 
 export const propose = async (
   ICVCMGovernor: ICVCMGovernor,
@@ -89,8 +90,28 @@ export const proposeAddMember = async (
   );
 };
 
+export const proposeRemoveMember = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles,
+  description: string,
+  address: string
+) => {
+  const encodedFunctionCall = ICVCMRoles.interface.encodeFunctionData(
+    "removeMember",
+    [address]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMRoles.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
 export const getProposals = async (
-  ICVCMGovernor: ICVCMGovernor
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles
 ): Promise<Proposal[]> => {
   const filter = ICVCMGovernor.filters.ProposalCreated();
   const proposals = await ICVCMGovernor.queryFilter(filter);
@@ -104,6 +125,7 @@ export const getProposals = async (
         state: await getProposalState(ICVCMGovernor, proposalId),
         targets: args.targets,
         calldatas: args.calldatas,
+        proposer: await getMember(ICVCMRoles, args.proposer),
       };
     })
   );

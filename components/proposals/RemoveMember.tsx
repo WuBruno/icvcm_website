@@ -4,37 +4,32 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Stack,
   TextField,
 } from "@mui/material";
 import { ethers } from "ethers";
 import React, { useState } from "react";
+import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
 import { useAsync, useICVCMGovernor, useICVCMRoles } from "~/hooks";
-import { proposeAddMember } from "~/services/proposals";
+import { getMembers } from "~/services/members";
+import { proposeRemoveMember } from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };
 
 function EditPrinciple({ setOpen }: Props) {
   const [description, setDescription] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState(Roles.Director);
   const [address, setAddress] = useState("");
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();
   const [_, submit] = useAsync(submitProposal);
+  const { data: members } = useSWR(ICVCMRoles ? "members" : null, async () =>
+    getMembers(ICVCMRoles)
+  );
 
   async function submitProposal() {
     setOpen(false);
-    return proposeAddMember(
-      ICVCMGovernor,
-      ICVCMRoles,
-      description,
-      name,
-      role,
-      address
-    );
+    return proposeRemoveMember(ICVCMGovernor, ICVCMRoles, description, address);
   }
 
   const handleChangeDescription = (
@@ -43,16 +38,8 @@ function EditPrinciple({ setOpen }: Props) {
     setDescription(event.target.value);
   };
 
-  const handleChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-
   const handleChangeAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(event.target.value);
-  };
-
-  const handleChangeRole = (event: SelectChangeEvent<Roles>) => {
-    setRole(event.target.value as Roles);
   };
 
   return (
@@ -62,34 +49,26 @@ function EditPrinciple({ setOpen }: Props) {
         multiline
         onChange={handleChangeDescription}
       />
-      <TextField label="Name" value={name} onChange={handleChangeName} />
 
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Role</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={role}
+          value={address}
           label="Role"
-          onChange={handleChangeRole}
+          onChange={handleChangeAddress}
         >
-          <MenuItem value={Roles.Director}>Director</MenuItem>
-          <MenuItem value={Roles.Expert}>Expert</MenuItem>
-          <MenuItem value={Roles.Secretariat}>Secretariat</MenuItem>
+          {members.map((member) => (
+            <MenuItem key={member.memberAddress} value={member.memberAddress}>
+              {ethers.utils.parseBytes32String(member.name)} -{" "}
+              {Roles[member.role]}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
 
-      <TextField
-        label="Address"
-        value={address}
-        onChange={handleChangeAddress}
-      />
-
-      <Button
-        variant="contained"
-        disabled={!name || !ethers.utils.isAddress(address)}
-        onClick={submit}
-      >
+      <Button variant="contained" disabled={!description} onClick={submit}>
         Propose
       </Button>
     </Stack>

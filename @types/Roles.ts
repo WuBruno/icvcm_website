@@ -3,3 +3,9 @@ export enum Roles {
   Expert,
   Secretariat,
 }
+
+export type Member = {
+  role: Roles;
+  name: string;
+  memberAddress: string;
+};

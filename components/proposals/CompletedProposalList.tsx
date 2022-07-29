@@ -11,7 +11,7 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { ProposalState } from "~/@types";
-import { useICVCMGovernor } from "~/hooks";
+import { useICVCMGovernor, useICVCMRoles } from "~/hooks";
 import { getProposals } from "~/services/proposals";
 import ExecuteProposalButton from "./ExecuteProposalButton";
 
@@ -20,11 +20,12 @@ type Props = {};
 const CompletedProposalList = (props: Props) => {
   const { account } = useWeb3React();
   const ICVCMGovernor = useICVCMGovernor();
+  const ICVCMRoles = useICVCMRoles();
   const shouldFetch = !!account;
 
   const { data: proposals } = useSWR(
     shouldFetch ? "getProposals" : null,
-    async () => getProposals(ICVCMGovernor)
+    async () => getProposals(ICVCMGovernor, ICVCMRoles)
   );
 
   const completedProposals =
