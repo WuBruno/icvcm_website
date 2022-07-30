@@ -21,6 +21,7 @@ const VoteButton = ({ proposalId }: Props) => {
   const { account } = useWeb3React();
   const shouldFetch = !!proposalId && !!account;
   const { user } = useUser();
+  const isDirector = !user || user.role !== Roles.Director;
 
   const { data: vote } = useSWR(
     shouldFetch ? ["getVote", proposalId] : null,
@@ -29,13 +30,6 @@ const VoteButton = ({ proposalId }: Props) => {
   const [_, executeVote] = useAsync(async (support: VoteSupport) =>
     castVote(ICVCMGovernor, proposalId, support)
   );
-
-  if (!user || user.role !== Roles.Director)
-    return (
-      <FixedButton variant="outlined" disabled>
-        N/A
-      </FixedButton>
-    );
 
   if (vote)
     return (
@@ -49,6 +43,7 @@ const VoteButton = ({ proposalId }: Props) => {
       <FixedButton
         variant="contained"
         color="success"
+        disabled={isDirector}
         onClick={() => executeVote(VoteSupport.For)}
       >
         For
@@ -56,6 +51,7 @@ const VoteButton = ({ proposalId }: Props) => {
       <FixedButton
         variant="outlined"
         color="error"
+        disabled={isDirector}
         onClick={() => executeVote(VoteSupport.Abstain)}
       >
         Against

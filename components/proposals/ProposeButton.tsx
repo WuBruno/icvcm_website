@@ -35,7 +35,11 @@ const ProposeButton = () => {
   const [proposalType, setProposalType] = useState<ProposalType>(
     ProposalType.EditPrinciple
   );
+
   const { user } = useUser();
+  const canPropose =
+    !user ||
+    ![Roles.Director, Roles.Expert, Roles.Secretariat].includes(user.role);
 
   const handleChangeProposalType = (
     event: React.MouseEvent<HTMLElement>,
@@ -63,18 +67,13 @@ const ProposeButton = () => {
     }
   };
 
-  const TabButtons = () => {};
-
   return (
     <div>
       <Button
         variant="contained"
         sx={{ marginY: 2 }}
         onClick={() => setOpen(true)}
-        disabled={
-          !user ||
-          [Roles.Director, Roles.Expert, Roles.Secretariat].includes(user.role)
-        }
+        disabled={canPropose}
       >
         Create Proposal
       </Button>

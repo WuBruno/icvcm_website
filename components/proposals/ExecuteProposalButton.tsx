@@ -16,17 +16,17 @@ function ExecuteProposalButton({ proposal }: Props) {
     executeProposal(ICVCMGovernor, proposal)
   );
 
-  if (!user || user.role !== Roles.Regulator)
-    return (
-      <Button variant="contained" disabled>
-        N/A
-      </Button>
-    );
+  const isRegulator = !user || user.role !== Roles.Regulator;
 
   switch (proposal.state) {
     case ProposalState.Succeeded:
       return (
-        <Button variant="contained" color="success" onClick={() => execute()}>
+        <Button
+          disabled={isRegulator}
+          variant="contained"
+          color="success"
+          onClick={() => execute()}
+        >
           Execute
         </Button>
       );
