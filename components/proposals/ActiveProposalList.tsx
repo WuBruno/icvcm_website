@@ -67,7 +67,7 @@ const ActiveProposalList = (props: Props) => {
                     {ProposalState[proposal.state]}
                   </TableCell>
                   <TableCell align="right">
-                    <VoteButton proposalId={proposal.proposalId} />
+                    <VoteButton proposal={proposal} />
                   </TableCell>
                 </TableRow>
               ))}

@@ -16,13 +16,13 @@ function ExecuteProposalButton({ proposal }: Props) {
     executeProposal(ICVCMGovernor, proposal)
   );
 
-  const isRegulator = !user || user.role !== Roles.Regulator;
+  const isRegulator = user && user.role === Roles.Regulator;
 
   switch (proposal.state) {
     case ProposalState.Succeeded:
       return (
         <Button
-          disabled={isRegulator}
+          disabled={!isRegulator}
           variant="contained"
           color="success"
           onClick={() => execute()}
@@ -40,6 +40,12 @@ function ExecuteProposalButton({ proposal }: Props) {
       return (
         <Button variant="contained" disabled>
           Executed
+        </Button>
+      );
+    case ProposalState.Cancelled:
+      return (
+        <Button variant="contained" disabled>
+          Canceled
         </Button>
       );
 

@@ -1,35 +1,47 @@
 import { Button, Stack } from "@mui/material";
 import styled from "@mui/styled-engine";
 import { useWeb3React } from "@web3-react/core";
-import { BigNumberish } from "ethers";
 import useSWR from "swr";
-import { VoteSupport } from "~/@types";
+import { Proposal, VoteSupport } from "~/@types";
 import { Roles } from "~/@types/Roles";
 import { useAsync, useICVCMGovernor, useUser } from "~/hooks";
+import { cancelProposal } from "~/services/proposals";
 import { castVote, getVote } from "~/services/vote";
 
 type Props = {
-  proposalId: BigNumberish;
+  proposal: Proposal;
 };
 
 const FixedButton = styled(Button)`
   width: 85px;
 `;
 
-const VoteButton = ({ proposalId }: Props) => {
+const VoteButton = ({ proposal }: Props) => {
   const ICVCMGovernor = useICVCMGovernor();
   const { account } = useWeb3React();
-  const shouldFetch = !!proposalId && !!account;
+  const shouldFetch = !!proposal.proposalId && !!account;
   const { user } = useUser();
-  const isDirector = !user || user.role !== Roles.Director;
+  const isDirector = user && user.role == Roles.Director;
+  const isRegulator = user && user.role === Roles.Regulator;
 
   const { data: vote } = useSWR(
-    shouldFetch ? ["getVote", proposalId] : null,
-    async () => getVote(ICVCMGovernor, proposalId, account)
+    shouldFetch ? ["getVote", proposal.proposalId] : null,
+    async () => getVote(ICVCMGovernor, proposal.proposalId, account)
   );
-  const [_, executeVote] = useAsync(async (support: VoteSupport) =>
-    castVote(ICVCMGovernor, proposalId, support)
+  const [, executeVote] = useAsync(async (support: VoteSupport) =>
+    castVote(ICVCMGovernor, proposal.proposalId, support)
   );
+  const [, executeCancel] = useAsync(async () =>
+    cancelProposal(ICVCMGovernor, proposal)
+  );
+
+  if (isRegulator) {
+    return (
+      <FixedButton variant="outlined" color="error" onClick={executeCancel}>
+        Cancel
+      </FixedButton>
+    );
+  }
 
   if (vote)
     return (

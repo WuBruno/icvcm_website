@@ -12,7 +12,7 @@ export type Proposal = {
 export enum ProposalState {
   Pending = 0,
   Active,
-  Canceled,
+  Cancelled,
   Defeated,
   Succeeded,
   Queued,

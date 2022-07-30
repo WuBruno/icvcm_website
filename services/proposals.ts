@@ -140,9 +140,22 @@ export const executeProposal = async (
   ICVCMGovernor: ICVCMGovernor,
   proposal: Proposal
 ) => {
-  console.log(proposal.targets, proposal.calldatas);
-
   const tx = await ICVCMGovernor.execute(
+    proposal.targets,
+    [0],
+    proposal.calldatas,
+    ethers.utils.id(proposal.description)
+  );
+  await tx.wait();
+
+  await mutate("getProposals");
+};
+
+export const cancelProposal = async (
+  ICVCMGovernor: ICVCMGovernor,
+  proposal: Proposal
+) => {
+  const tx = await ICVCMGovernor.cancel(
     proposal.targets,
     [0],
     proposal.calldatas,
