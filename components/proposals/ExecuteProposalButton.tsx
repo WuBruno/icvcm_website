@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
-import React from "react";
 import { Proposal, ProposalState } from "~/@types";
-import { useAsync, useICVCMGovernor } from "~/hooks";
+import { Roles } from "~/@types/Roles";
+import { useAsync, useICVCMGovernor, useUser } from "~/hooks";
 import { executeProposal } from "~/services/proposals";
 
 type Props = {
@@ -10,10 +10,18 @@ type Props = {
 
 function ExecuteProposalButton({ proposal }: Props) {
   const ICVCMGovernor = useICVCMGovernor();
+  const { user } = useUser();
 
   const [_, execute] = useAsync(async () =>
     executeProposal(ICVCMGovernor, proposal)
   );
+
+  if (!user || user.role !== Roles.Regulator)
+    return (
+      <Button variant="contained" disabled>
+        N/A
+      </Button>
+    );
 
   switch (proposal.state) {
     case ProposalState.Succeeded:

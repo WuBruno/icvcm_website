@@ -46,8 +46,9 @@ const CompletedProposalList = (props: Props) => {
           <TableHead>
             <TableRow>
               <TableCell>Description</TableCell>
+              <TableCell align="right">Proposer</TableCell>
               <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Vote</TableCell>
+              <TableCell align="right">Decide</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -60,6 +61,7 @@ const CompletedProposalList = (props: Props) => {
                   <TableCell component="th" scope="row">
                     {proposal.description}
                   </TableCell>
+                  <TableCell align="right">{proposal.proposer.name}</TableCell>
                   <TableCell align="right">
                     {ProposalState[proposal.state]}
                   </TableCell>

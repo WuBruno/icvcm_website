@@ -7,6 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { Roles } from "~/@types/Roles";
+import { useUser } from "~/hooks";
 import { AddMember, EditPrinciple, EditStrategy, RemoveMember } from ".";
 
 const style = {
@@ -33,6 +35,7 @@ const ProposeButton = () => {
   const [proposalType, setProposalType] = useState<ProposalType>(
     ProposalType.EditPrinciple
   );
+  const { user } = useUser();
 
   const handleChangeProposalType = (
     event: React.MouseEvent<HTMLElement>,
@@ -60,12 +63,18 @@ const ProposeButton = () => {
     }
   };
 
+  const TabButtons = () => {};
+
   return (
     <div>
       <Button
         variant="contained"
         sx={{ marginY: 2 }}
         onClick={() => setOpen(true)}
+        disabled={
+          !user ||
+          [Roles.Director, Roles.Expert, Roles.Secretariat].includes(user.role)
+        }
       >
         Create Proposal
       </Button>
