@@ -15,9 +15,7 @@ import { VoteButton } from "~/components/vote";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposals } from "~/services/proposals";
 
-type Props = {};
-
-const ActiveProposalList = (props: Props) => {
+const ActiveProposalList = () => {
   const { account } = useWeb3React();
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();

@@ -3,11 +3,7 @@ import { useWeb3React } from "@web3-react/core";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useAsync } from "~/hooks/common";
-import {
-  useICVCMConstitution,
-  useICVCMGovernor,
-  useICVCMToken,
-} from "~/hooks/contracts";
+import { useICVCMConstitution, useICVCMGovernor } from "~/hooks/contracts";
 import { getPrinciples } from "~/services/constitution";
 import { proposePrinciple } from "~/services/proposals";
 
@@ -17,7 +13,6 @@ function EditPrinciple({ setOpen }: Props) {
   const [description, setDescription] = useState("");
   const [principles, setPrinciples] = useState("");
   const ICVCMGovernor = useICVCMGovernor();
-  const ICVCMToken = useICVCMToken();
   const ICVCMConstitution = useICVCMConstitution();
   const { account } = useWeb3React();
   const [_, submit] = useAsync(submitProposal);

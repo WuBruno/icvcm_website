@@ -47,7 +47,7 @@ const VoteButton = ({ proposal }: Props) => {
   if (vote)
     return (
       <FixedButton variant="outlined" disabled>
-        {vote.support === VoteSupport.For ? "For" : "Against"}
+        {VoteSupport[vote.support]}
       </FixedButton>
     );
 
@@ -56,16 +56,23 @@ const VoteButton = ({ proposal }: Props) => {
       <FixedButton
         variant="contained"
         color="success"
-        disabled={isDirector}
+        disabled={!isDirector}
         onClick={() => executeVote(VoteSupport.For)}
       >
         For
       </FixedButton>
       <FixedButton
         variant="outlined"
-        color="error"
-        disabled={isDirector}
+        disabled={!isDirector}
         onClick={() => executeVote(VoteSupport.Abstain)}
+      >
+        Abstain
+      </FixedButton>
+      <FixedButton
+        variant="outlined"
+        color="error"
+        disabled={!isDirector}
+        onClick={() => executeVote(VoteSupport.Against)}
       >
         Against
       </FixedButton>
