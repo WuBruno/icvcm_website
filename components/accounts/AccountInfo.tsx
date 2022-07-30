@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material";
 import { Roles } from "~/@types/Roles";
-import { useUser } from "~/hooks";
+import { useUser } from "~/hooks/common";
 
 type Props = {};
 

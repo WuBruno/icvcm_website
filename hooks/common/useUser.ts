@@ -2,7 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { Member } from "~/@types/Roles";
 import { getMember } from "~/services/members";
-import useICVCMRoles from "./useICVCMRoles";
+import { useICVCMRoles } from "../contracts";
 
 const useUser = (): { user?: Member } => {
   const ICVCMRoles = useICVCMRoles();

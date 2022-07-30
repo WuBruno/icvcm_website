@@ -1,15 +1,7 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar } from "@mui/material";
 import Image from "next/image";
-import React from "react";
-import useEagerConnect from "~/hooks/useEagerConnect";
 import { Account } from "~/components/accounts";
+import { useEagerConnect } from "~/hooks/utils";
 
 type Props = {};
 

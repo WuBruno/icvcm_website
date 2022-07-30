@@ -12,7 +12,7 @@ import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { ProposalState } from "~/@types";
 import { VoteButton } from "~/components/vote";
-import { useICVCMGovernor, useICVCMRoles } from "~/hooks";
+import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposals } from "~/services/proposals";
 
 type Props = {};

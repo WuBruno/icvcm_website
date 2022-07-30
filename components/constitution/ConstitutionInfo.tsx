@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import useSWR from "swr";
-import { useICVCMConstitution } from "~/hooks";
+import { useICVCMConstitution } from "~/hooks/contracts";
 import { getPrinciples, getStrategies } from "~/services/constitution";
 import { MembersList } from "../members";
 

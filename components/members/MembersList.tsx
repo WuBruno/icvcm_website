@@ -9,7 +9,7 @@ import {
 import { ethers } from "ethers";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
-import { useICVCMRoles } from "~/hooks";
+import { useICVCMRoles } from "~/hooks/contracts";
 import { getMembers } from "~/services/members";
 
 type Props = {};

@@ -4,7 +4,8 @@ import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { Proposal, VoteSupport } from "~/@types";
 import { Roles } from "~/@types/Roles";
-import { useAsync, useICVCMGovernor, useUser } from "~/hooks";
+import { useAsync, useUser } from "~/hooks/common";
+import { useICVCMGovernor } from "~/hooks/contracts";
 import { cancelProposal } from "~/services/proposals";
 import { castVote, getVote } from "~/services/vote";
 

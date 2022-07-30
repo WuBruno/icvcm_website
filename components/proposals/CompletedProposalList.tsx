@@ -11,7 +11,7 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { ProposalState } from "~/@types";
-import { useICVCMGovernor, useICVCMRoles } from "~/hooks";
+import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposals } from "~/services/proposals";
 import ExecuteProposalButton from "./ExecuteProposalButton";
 

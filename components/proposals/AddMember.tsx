@@ -11,7 +11,8 @@ import {
 import { ethers } from "ethers";
 import React, { useState } from "react";
 import { Roles } from "~/@types/Roles";
-import { useAsync, useICVCMGovernor, useICVCMRoles } from "~/hooks";
+import { useAsync } from "~/hooks/common";
+import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { proposeAddMember } from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };

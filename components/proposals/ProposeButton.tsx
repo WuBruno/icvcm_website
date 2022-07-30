@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Roles } from "~/@types/Roles";
-import { useUser } from "~/hooks";
+import { useUser } from "~/hooks/common";
 import { AddMember, EditPrinciple, EditStrategy, RemoveMember } from ".";
 
 const style = {

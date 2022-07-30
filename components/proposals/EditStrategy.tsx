@@ -2,18 +2,14 @@ import { Button, Stack, TextField } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
+import { useAsync } from "~/hooks/common";
 import {
-  useAsync,
   useICVCMConstitution,
   useICVCMGovernor,
   useICVCMToken,
-} from "~/hooks";
-import { getPrinciples, getStrategies } from "~/services/constitution";
-import {
-  propose,
-  proposePrinciple,
-  proposeStrategy,
-} from "~/services/proposals";
+} from "~/hooks/contracts";
+import { getStrategies } from "~/services/constitution";
+import { proposeStrategy } from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };
 

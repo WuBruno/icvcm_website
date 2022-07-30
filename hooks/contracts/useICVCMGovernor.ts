@@ -1,8 +1,8 @@
+import ContractAddress from "~/contract.json";
 import ICVCM_GOVERNOR_CONTRACT_ABI from "~/contracts/ICVCMGovernor.json";
 import type { ICVCMGovernor } from "~/contracts/types";
-import ContractAddress from "~/contract.json";
 
-import { useContract } from "~/hooks";
+import { useContract } from "~/hooks/contracts";
 
 export default function useICVCMGovernor() {
   return useContract<ICVCMGovernor>(

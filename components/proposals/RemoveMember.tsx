@@ -11,7 +11,8 @@ import { ethers } from "ethers";
 import React, { useState } from "react";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
-import { useAsync, useICVCMGovernor, useICVCMRoles } from "~/hooks";
+import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
+import { useAsync } from "~/hooks/common";
 import { getMembers } from "~/services/members";
 import { proposeRemoveMember } from "~/services/proposals";
 
