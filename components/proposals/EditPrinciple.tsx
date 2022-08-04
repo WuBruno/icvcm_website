@@ -22,8 +22,6 @@ function EditPrinciple({ setOpen }: Props) {
   );
 
   useEffect(() => {
-    console.log("Principles data", data);
-
     if (data) {
       setPrinciples(data);
     }
@@ -37,7 +35,6 @@ function EditPrinciple({ setOpen }: Props) {
       principles,
       description
     );
-    console.log(proposalId);
   }
 
   const handleChangeDescription = (

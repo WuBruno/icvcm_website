@@ -40,7 +40,6 @@ function EditPrinciple({ setOpen }: Props) {
       strategies,
       description
     );
-    console.log(proposalId);
   }
 
   const handleChangeDescription = (

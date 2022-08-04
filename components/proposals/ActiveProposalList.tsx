@@ -11,9 +11,9 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import useSWR from "swr";
 import { ProposalState } from "~/@types";
-import { VoteButton } from "~/components/vote";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposals } from "~/services/proposals";
+import { ActiveProposalItem } from ".";
 
 const ActiveProposalList = () => {
   const { account } = useWeb3React();
@@ -42,6 +42,7 @@ const ActiveProposalList = () => {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
+              <TableCell />
               <TableCell>Description</TableCell>
               <TableCell align="right">Proposer</TableCell>
               <TableCell align="right">Status</TableCell>
@@ -51,23 +52,10 @@ const ActiveProposalList = () => {
           <TableBody>
             {activeProposals &&
               activeProposals.map((proposal) => (
-                <TableRow
+                <ActiveProposalItem
                   key={proposal.proposalId}
-                  sx={{
-                    "&:last-child td, &:last-child th": { border: 0 },
-                  }}
-                >
-                  <TableCell component="th" scope="row">
-                    {proposal.description}
-                  </TableCell>
-                  <TableCell align="right">{proposal.proposer.name}</TableCell>
-                  <TableCell align="right">
-                    {ProposalState[proposal.state]}
-                  </TableCell>
-                  <TableCell align="right">
-                    <VoteButton proposal={proposal} />
-                  </TableCell>
-                </TableRow>
+                  proposal={proposal}
+                />
               ))}
           </TableBody>
         </Table>

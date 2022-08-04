@@ -1,7 +1,8 @@
-import { BigNumberish } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { mutate } from "swr";
-import { Vote, VoteSupport } from "~/@types";
-import { ICVCMGovernor } from "~/contracts/types";
+import { MemberVote, Vote, VoteSupport } from "~/@types";
+import { ICVCMGovernor, ICVCMRoles } from "~/contracts/types";
+import { getMember } from "./members";
 
 export const hasVoted = async (
   ICVCMGovernor: ICVCMGovernor,
@@ -13,34 +14,64 @@ export const hasVoted = async (
 
 export const getVote = async (
   ICVCMGovernor: ICVCMGovernor,
-  proposalId: BigNumberish,
+  proposalId: string,
   address: string
 ): Promise<Vote | null> => {
-  const filter = ICVCMGovernor.filters.VoteCast(address);
+  const filter = ICVCMGovernor.filters.VoteCast(
+    address,
+    ethers.BigNumber.from(proposalId)
+  );
   const proposals = await ICVCMGovernor.queryFilter(filter);
 
-  const proposal = proposals.find(
-    (proposal) => proposal.args.proposalId == proposalId
-  );
-
-  if (!proposal) {
-    return;
+  if (proposals.length === 0) {
+    return null;
   }
+
+  const proposal = proposals[0];
+  const block = await proposal.getBlock();
 
   return {
     proposalId,
-    voter: proposal.args.voter,
     support: proposal.args.support,
+    time: new Date(block.timestamp * 1e3),
   };
+};
+
+export const getVotes = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles,
+  proposalId: string
+): Promise<MemberVote[]> => {
+  const filter = ICVCMGovernor.filters.VoteCast(
+    null,
+    ethers.BigNumber.from(proposalId)
+  );
+  const votes = await ICVCMGovernor.queryFilter(filter);
+
+  return Promise.all(
+    votes.map(async (vote) => {
+      const block = await vote.getBlock();
+      const member = await getMember(ICVCMRoles, vote.args.voter);
+      return {
+        proposalId,
+        voter: member,
+        support: vote.args.support,
+        time: new Date(block.timestamp * 1e3),
+      };
+    })
+  );
 };
 
 export const castVote = async (
   ICVCMGovernor: ICVCMGovernor,
-  proposalId: BigNumberish,
+  proposalId: string,
   support: VoteSupport
 ) => {
   const voteTx = await ICVCMGovernor.castVote(proposalId, support);
+  const signerAddress = await ICVCMGovernor.signer.getAddress();
+
   await voteTx.wait();
 
-  return mutate(["getVote", proposalId]);
+  mutate(["getVote", proposalId, signerAddress]);
+  mutate(["getVotes", proposalId]);
 };

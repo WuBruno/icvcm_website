@@ -1,4 +1,5 @@
 import { BigNumberish } from "ethers";
+import { Member } from "./Roles";
 
 export enum VoteSupport {
   Against = 0,
@@ -8,6 +9,10 @@ export enum VoteSupport {
 
 export type Vote = {
   proposalId: BigNumberish;
-  voter: string;
   support: VoteSupport;
+  time: Date;
+};
+
+export type MemberVote = Vote & {
+  voter: Member;
 };

@@ -117,8 +117,10 @@ export const getProposals = async (
   const proposals = await ICVCMGovernor.queryFilter(filter);
 
   return Promise.all(
-    proposals.map(async ({ args }) => {
+    proposals.map(async ({ args, getBlock }) => {
       const proposalId = args.proposalId.toString();
+      const block = await getBlock();
+
       return {
         proposalId: proposalId,
         description: args.description,
@@ -126,6 +128,7 @@ export const getProposals = async (
         targets: args.targets,
         calldatas: args.calldatas,
         proposer: await getMember(ICVCMRoles, args.proposer),
+        time: new Date(block.timestamp * 1e3),
       };
     })
   );

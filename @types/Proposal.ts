@@ -7,6 +7,7 @@ export type Proposal = {
   targets: string[];
   calldatas: string[];
   proposer: Member;
+  time: Date;
 };
 
 export enum ProposalState {

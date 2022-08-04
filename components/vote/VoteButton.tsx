@@ -26,7 +26,7 @@ const VoteButton = ({ proposal }: Props) => {
   const isRegulator = user && user.role === Roles.Regulator;
 
   const { data: vote } = useSWR(
-    shouldFetch ? ["getVote", proposal.proposalId] : null,
+    shouldFetch ? ["getVote", proposal.proposalId, account] : null,
     async () => getVote(ICVCMGovernor, proposal.proposalId, account)
   );
   const [, executeVote] = useAsync(async (support: VoteSupport) =>

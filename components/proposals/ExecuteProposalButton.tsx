@@ -1,8 +1,8 @@
 import { Button } from "@mui/material";
 import { Proposal, ProposalState } from "~/@types";
 import { Roles } from "~/@types/Roles";
-import { useAsync } from "~/hooks/common";
-import { useICVCMGovernor, useUser } from "~/hooks/contracts";
+import { useAsync, useUser } from "~/hooks/common";
+import { useICVCMGovernor } from "~/hooks/contracts";
 import { executeProposal } from "~/services/proposals";
 
 type Props = {
