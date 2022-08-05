@@ -13,7 +13,7 @@ import useSWR from "swr";
 import { ProposalState } from "~/@types";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposals } from "~/services/proposals";
-import ExecuteProposalButton from "./ExecuteProposalButton";
+import CompletedProposalItem from "./CompletedProposalItem";
 
 type Props = {};
 
@@ -45,6 +45,7 @@ const CompletedProposalList = (props: Props) => {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
+              <TableCell />
               <TableCell>Description</TableCell>
               <TableCell align="right">Proposer</TableCell>
               <TableCell align="right">Status</TableCell>
@@ -54,21 +55,10 @@ const CompletedProposalList = (props: Props) => {
           <TableBody>
             {completedProposals &&
               completedProposals.map((proposal) => (
-                <TableRow
+                <CompletedProposalItem
                   key={proposal.proposalId}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {proposal.description}
-                  </TableCell>
-                  <TableCell align="right">{proposal.proposer.name}</TableCell>
-                  <TableCell align="right">
-                    {ProposalState[proposal.state]}
-                  </TableCell>
-                  <TableCell align="right">
-                    <ExecuteProposalButton proposal={proposal} />
-                  </TableCell>
-                </TableRow>
+                  proposal={proposal}
+                />
               ))}
           </TableBody>
         </Table>

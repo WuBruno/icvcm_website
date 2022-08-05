@@ -139,6 +139,40 @@ export const getProposalState = async (
   proposalId: string
 ): Promise<ProposalState> => ICVCMGovernor.state(proposalId);
 
+export const getProposalExecutionEvent = async (
+  ICVCMGovernor: ICVCMGovernor,
+  proposalId: string
+) => {
+  const filter = ICVCMGovernor.filters.ProposalExecuted(
+    ethers.BigNumber.from(proposalId)
+  );
+  const result = await ICVCMGovernor.queryFilter(filter);
+
+  if (result.length === 0) {
+    return;
+  }
+  const block = await result[0].getBlock();
+
+  return new Date(block.timestamp * 1e3);
+};
+
+export const getProposalCancelEvent = async (
+  ICVCMGovernor: ICVCMGovernor,
+  proposalId: string
+) => {
+  const filter = ICVCMGovernor.filters.ProposalCanceled(
+    ethers.BigNumber.from(proposalId)
+  );
+  const result = await ICVCMGovernor.queryFilter(filter);
+
+  if (result.length === 0) {
+    return;
+  }
+  const block = await result[0].getBlock();
+
+  return new Date(block.timestamp * 1e3);
+};
+
 export const executeProposal = async (
   ICVCMGovernor: ICVCMGovernor,
   proposal: Proposal
@@ -152,6 +186,7 @@ export const executeProposal = async (
   await tx.wait();
 
   await mutate("getProposals");
+  await mutate(["getProposalExecutionEvent", proposal.proposalId]);
 };
 
 export const cancelProposal = async (
@@ -167,4 +202,5 @@ export const cancelProposal = async (
   await tx.wait();
 
   await mutate("getProposals");
+  await mutate(["getProposalCancelEvent", proposal.proposalId]);
 };
