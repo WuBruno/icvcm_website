@@ -33,7 +33,7 @@ const ProposalInfo = ({ proposal }: Props) => {
       case "removeMember":
         return (
           <Stack>
-            <Typography>
+            <Typography gutterBottom>
               Action: <b>Removing Member</b>
             </Typography>
             <Typography>Member Details:</Typography>
@@ -51,11 +51,11 @@ const ProposalInfo = ({ proposal }: Props) => {
       case "editPrinciples":
         return (
           <Stack>
-            <Typography>
+            <Typography gutterBottom>
               Action: <b>Editing Principles</b>
             </Typography>
             <Typography>Proposed Principles: </Typography>
-            <Typography variant="body2">
+            <Typography paragraph variant="body2">
               {proposalAction.payload.principles}
             </Typography>
           </Stack>
@@ -63,11 +63,11 @@ const ProposalInfo = ({ proposal }: Props) => {
       case "editStrategies":
         return (
           <Stack>
-            <Typography>
+            <Typography gutterBottom>
               Action: <b>Editing Strategies</b>
             </Typography>
             <Typography>Proposed New Strategies: </Typography>
-            <Typography variant="body2">
+            <Typography paragraph variant="body2">
               {proposalAction.payload.strategies}
             </Typography>
           </Stack>
