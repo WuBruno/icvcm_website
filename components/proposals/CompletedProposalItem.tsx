@@ -1,16 +1,9 @@
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
-import {
-  Box,
-  Collapse,
-  IconButton,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Collapse, IconButton, TableCell, TableRow } from "@mui/material";
 import { useState } from "react";
 import { Proposal, ProposalState } from "~/@types";
 import ExecuteProposalButton from "./ExecuteProposalButton";
-import ProposalHistory from "./ProposalHistory";
+import ProposalInfo from "./ProposalInfo";
 
 type Props = {
   proposal: Proposal;
@@ -46,12 +39,7 @@ const CompletedProposalItem = ({ proposal }: Props) => {
       <TableRow sx={{ "& > *": { borderTop: "unset" } }}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-              <ProposalHistory proposal={proposal} />
-            </Box>
+            <ProposalInfo proposal={proposal} />
           </Collapse>
         </TableCell>
       </TableRow>

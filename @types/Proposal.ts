@@ -8,6 +8,7 @@ export type Proposal = {
   calldatas: string[];
   proposer: Member;
   time: Date;
+  proposalAction: ProposalAction;
 };
 
 export enum ProposalState {
@@ -20,3 +21,42 @@ export enum ProposalState {
   Expired,
   Executed,
 }
+
+type Action = {
+  action: string;
+  payload: unknown;
+};
+
+type AddMemberAction = Action & {
+  action: "addMember";
+  payload: {
+    member: Member;
+  };
+};
+
+type RemoveMemberAction = Action & {
+  action: "removeMember";
+  payload: {
+    member: Member;
+  };
+};
+
+type EditPrinciplesAction = Action & {
+  action: "editPrinciples";
+  payload: {
+    principles: string;
+  };
+};
+
+type EditStrategiesAction = Action & {
+  action: "editStrategies";
+  payload: {
+    strategies: string;
+  };
+};
+
+export type ProposalAction =
+  | AddMemberAction
+  | RemoveMemberAction
+  | EditPrinciplesAction
+  | EditStrategiesAction;

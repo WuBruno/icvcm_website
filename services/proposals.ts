@@ -1,11 +1,14 @@
 import { ethers } from "ethers";
 import { mutate } from "swr";
-import { Proposal, ProposalState } from "~/@types";
+import { Proposal, ProposalAction, ProposalState } from "~/@types";
 import { Roles } from "~/@types/Roles";
+import ContractAddresses from "~/contract.json";
 import {
   ICVCMConstitution,
+  ICVCMConstitution__factory,
   ICVCMGovernor,
   ICVCMRoles,
+  ICVCMToken,
 } from "~/contracts/types";
 import { getMember } from "./members";
 
@@ -121,6 +124,79 @@ export const getProposals = async (
       const proposalId = args.proposalId.toString();
       const block = await getBlock();
 
+      const contractAddress = args.targets[0];
+      const calldata = args.calldatas[0];
+      const methodId = calldata.slice(0, 10);
+
+      let proposalAction: ProposalAction;
+
+      if (contractAddress === ContractAddresses.ICVCMRoles) {
+        // They are role changes
+        const ICVCMRolesInterface = ICVCMRoles.interface;
+        const fragment = ICVCMRolesInterface.getFunction(methodId);
+        switch (fragment) {
+          case ICVCMRolesInterface.functions[
+            "addMember(address,uint8,bytes32)"
+          ]:
+            var [address, role, name] = ICVCMRolesInterface.decodeFunctionData(
+              fragment,
+              calldata
+            );
+            proposalAction = {
+              action: "addMember",
+              payload: {
+                member: {
+                  memberAddress: address,
+                  role,
+                  name: ethers.utils.parseBytes32String(name),
+                },
+              },
+            };
+            break;
+
+          case ICVCMRolesInterface.functions["removeMember(address)"]:
+            var [address] = ICVCMRolesInterface.decodeFunctionData(
+              fragment,
+              calldata
+            );
+            proposalAction = {
+              action: "removeMember",
+              payload: {
+                member: await getMember(ICVCMRoles, address),
+              },
+            };
+            break;
+        }
+      } else if (contractAddress === ContractAddresses.ICVCMConstitution) {
+        // They are constitution changes
+        const ICVCMConstitutionInterface =
+          ICVCMConstitution__factory.createInterface();
+        const fragment = ICVCMConstitutionInterface.getFunction(methodId);
+
+        switch (fragment) {
+          case ICVCMConstitutionInterface.functions["setPrinciples(string)"]:
+            var [principles] = ICVCMConstitutionInterface.decodeFunctionData(
+              fragment,
+              calldata
+            );
+            proposalAction = {
+              action: "editPrinciples",
+              payload: { principles },
+            };
+            break;
+          case ICVCMConstitutionInterface.functions["setStrategies(string)"]:
+            var [strategies] = ICVCMConstitutionInterface.decodeFunctionData(
+              fragment,
+              calldata
+            );
+            proposalAction = {
+              action: "editStrategies",
+              payload: { strategies },
+            };
+            break;
+        }
+      }
+
       return {
         proposalId: proposalId,
         description: args.description,
@@ -129,6 +205,7 @@ export const getProposals = async (
         calldatas: args.calldatas,
         proposer: await getMember(ICVCMRoles, args.proposer),
         time: new Date(block.timestamp * 1e3),
+        proposalAction,
       };
     })
   );
@@ -187,6 +264,7 @@ export const executeProposal = async (
 
   await mutate("getProposals");
   await mutate(["getProposalExecutionEvent", proposal.proposalId]);
+  await mutate(["getTotalVotesRequired", proposal.proposalId]);
 };
 
 export const cancelProposal = async (
@@ -203,4 +281,13 @@ export const cancelProposal = async (
 
   await mutate("getProposals");
   await mutate(["getProposalCancelEvent", proposal.proposalId]);
+};
+
+export const getTotalVotesRequired = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMToken: ICVCMToken,
+  proposalId: string
+) => {
+  const blockNumber = await ICVCMGovernor.proposalSnapshot(proposalId);
+  return ICVCMToken.getPastTotalSupply(blockNumber);
 };

@@ -9,7 +9,11 @@ import {
 import { useState } from "react";
 import { Roles } from "~/@types/Roles";
 import { useUser } from "~/hooks/common";
-import { AddMember, EditPrinciple, EditStrategy, RemoveMember } from ".";
+
+import AddMember from "./AddMember";
+import EditPrinciple from "./EditPrinciple";
+import EditStrategy from "./EditStrategy";
+import RemoveMember from "./RemoveMember";
 
 const style = {
   position: "absolute" as "absolute",

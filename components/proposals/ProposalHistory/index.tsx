@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   List,
   ListItem,
   ListItemAvatar,
@@ -14,7 +15,12 @@ import { useMemo } from "react";
 import useSWR from "swr";
 import { Proposal, ProposalState, VoteSupport } from "~/@types";
 import { Roles } from "~/@types/Roles";
-import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
+import {
+  useICVCMGovernor,
+  useICVCMRoles,
+  useICVCMToken,
+} from "~/hooks/contracts";
+import { getTotalVotesRequired } from "~/services/proposals";
 import { getVotes } from "~/services/vote";
 import FinalDecisionInfo from "./FinalDecisionInfo";
 import SupportIcon from "./SupportIcon";
@@ -31,8 +37,14 @@ const ProposalHistory = ({ proposal }: Props) => {
     : 2;
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();
+  const ICVCMToken = useICVCMToken();
   const { data: votes } = useSWR(["getVote", proposal.proposalId], async () =>
     getVotes(ICVCMGovernor, ICVCMRoles, proposal.proposalId)
+  );
+  const { data: votesRequired } = useSWR(
+    ["getTotalVotesRequired", proposal.proposalId],
+    async () =>
+      getTotalVotesRequired(ICVCMGovernor, ICVCMToken, proposal.proposalId)
   );
 
   const [totalCount, forCount, abstainCount, againstCount] = useMemo(() => {
@@ -72,13 +84,24 @@ const ProposalHistory = ({ proposal }: Props) => {
         <Step key={1} expanded>
           <StepLabel>Proposal Voting</StepLabel>
           <StepContent>
-            <ListItem>
-              <Typography>
-                For: {forCount} Abstain: {abstainCount} Against: {againstCount}
-              </Typography>
-              <Typography>Total: {totalCount}</Typography>
-            </ListItem>
+            <Typography>
+              <b>For:</b> {(forCount / totalCount) * 100 || 0}% ({forCount})
+            </Typography>
+            <Typography>
+              <b>Abstain:</b> {(abstainCount / totalCount) * 100 || 0}% (
+              {abstainCount})
+            </Typography>
+            <Typography gutterBottom>
+              <b>Against:</b> {(againstCount / totalCount) * 100 || 0}% (
+              {againstCount})
+            </Typography>
+            <Typography gutterBottom>
+              <b>Total votes:</b> {totalCount}/{votesRequired?.toNumber()}
+            </Typography>
 
+            <Divider />
+
+            <Typography variant="h6">Votes:</Typography>
             <List>
               {votes &&
                 votes.map((vote) => (
