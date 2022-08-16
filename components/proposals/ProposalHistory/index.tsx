@@ -98,6 +98,9 @@ const ProposalHistory = ({ proposal }: Props) => {
             <Typography gutterBottom>
               <b>Total votes:</b> {totalCount}/{votesRequired?.toNumber()}
             </Typography>
+            <Typography gutterBottom>
+              <b>Voting Deadline:</b> {proposal.deadline.toLocaleString()}
+            </Typography>
 
             <Divider />
 

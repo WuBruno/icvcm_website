@@ -7,11 +7,6 @@
         "type": "address"
       },
       {
-        "internalType": "contract ICVCMConstitution",
-        "name": "_constitution",
-        "type": "address"
-      },
-      {
         "internalType": "contract ICVCMRoles",
         "name": "_roles",
         "type": "address"
@@ -42,7 +37,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "proposalId",
         "type": "uint256"

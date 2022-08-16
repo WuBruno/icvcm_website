@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { mutate } from "swr";
 import { Proposal, ProposalAction, ProposalState } from "~/@types";
 import { Roles } from "~/@types/Roles";
@@ -10,6 +10,7 @@ import {
   ICVCMRoles,
   ICVCMToken,
 } from "~/contracts/types";
+import { ProposalCreatedEvent } from "~/contracts/types/Governor";
 import { getMember } from "./members";
 
 export const propose = async (
@@ -112,6 +113,132 @@ export const proposeRemoveMember = async (
   );
 };
 
+const parseProposalEvent = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles,
+  { args, getBlock }: ProposalCreatedEvent
+): Promise<Proposal> => {
+  const proposalId = args.proposalId.toString();
+  const block = await getBlock();
+
+  const contractAddress = args.targets[0];
+  const calldata = args.calldatas[0];
+  const methodId = calldata.slice(0, 10);
+
+  let proposalAction: ProposalAction;
+
+  if (contractAddress === ContractAddresses.ICVCMRoles) {
+    // They are role changes
+    const ICVCMRolesInterface = ICVCMRoles.interface;
+    const fragment = ICVCMRolesInterface.getFunction(methodId);
+    switch (fragment) {
+      case ICVCMRolesInterface.functions["addMember(address,uint8,bytes32)"]:
+        var [address, role, name] = ICVCMRolesInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "addMember",
+          payload: {
+            member: {
+              memberAddress: address,
+              role,
+              name: ethers.utils.parseBytes32String(name),
+            },
+          },
+        };
+        break;
+
+      case ICVCMRolesInterface.functions["removeMember(address)"]:
+        var [address] = ICVCMRolesInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "removeMember",
+          payload: {
+            member: await getMember(ICVCMRoles, address),
+          },
+        };
+        break;
+    }
+  } else if (contractAddress === ContractAddresses.ICVCMConstitution) {
+    // They are constitution changes
+    const ICVCMConstitutionInterface =
+      ICVCMConstitution__factory.createInterface();
+    const fragment = ICVCMConstitutionInterface.getFunction(methodId);
+
+    switch (fragment) {
+      case ICVCMConstitutionInterface.functions["setPrinciples(string)"]:
+        var [principles] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "editPrinciples",
+          payload: { principles },
+        };
+        break;
+      case ICVCMConstitutionInterface.functions["setStrategies(string)"]:
+        var [strategies] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "editStrategies",
+          payload: { strategies },
+        };
+        break;
+    }
+  }
+
+  return {
+    proposalId: proposalId,
+    description: args.description,
+    state: await getProposalState(ICVCMGovernor, proposalId),
+    targets: args.targets,
+    calldatas: args.calldatas,
+    proposer: await getMember(ICVCMRoles, args.proposer),
+    time: new Date(block.timestamp * 1e3),
+    proposalAction,
+    deadline: await getProposalDeadline(
+      ICVCMGovernor,
+      proposalId,
+      block.timestamp * 1e3,
+      block.number
+    ),
+  };
+};
+
+export const getProposalDeadline = async (
+  ICVCMGovernor: ICVCMGovernor,
+  proposalId: string,
+  startTime: number,
+  startBlock: number
+) => {
+  const endBlock = await ICVCMGovernor.proposalDeadline(proposalId);
+  const blockDiff = endBlock.toNumber() - startBlock;
+
+  return new Date(
+    blockDiff * Number(process.env.NEXT_PUBLIC_BLOCK_INTERVAL) + startTime
+  );
+};
+
+export const getProposal = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles,
+  proposalId: BigNumberish
+) => {
+  const filter = ICVCMGovernor.filters.ProposalCreated(proposalId);
+  const proposals = await ICVCMGovernor.queryFilter(filter);
+
+  if (proposals.length === 0) {
+    return null;
+  }
+
+  return parseProposalEvent(ICVCMGovernor, ICVCMRoles, proposals[0]);
+};
+
 export const getProposals = async (
   ICVCMGovernor: ICVCMGovernor,
   ICVCMRoles: ICVCMRoles
@@ -120,94 +247,9 @@ export const getProposals = async (
   const proposals = await ICVCMGovernor.queryFilter(filter);
 
   return Promise.all(
-    proposals.map(async ({ args, getBlock }) => {
-      const proposalId = args.proposalId.toString();
-      const block = await getBlock();
-
-      const contractAddress = args.targets[0];
-      const calldata = args.calldatas[0];
-      const methodId = calldata.slice(0, 10);
-
-      let proposalAction: ProposalAction;
-
-      if (contractAddress === ContractAddresses.ICVCMRoles) {
-        // They are role changes
-        const ICVCMRolesInterface = ICVCMRoles.interface;
-        const fragment = ICVCMRolesInterface.getFunction(methodId);
-        switch (fragment) {
-          case ICVCMRolesInterface.functions[
-            "addMember(address,uint8,bytes32)"
-          ]:
-            var [address, role, name] = ICVCMRolesInterface.decodeFunctionData(
-              fragment,
-              calldata
-            );
-            proposalAction = {
-              action: "addMember",
-              payload: {
-                member: {
-                  memberAddress: address,
-                  role,
-                  name: ethers.utils.parseBytes32String(name),
-                },
-              },
-            };
-            break;
-
-          case ICVCMRolesInterface.functions["removeMember(address)"]:
-            var [address] = ICVCMRolesInterface.decodeFunctionData(
-              fragment,
-              calldata
-            );
-            proposalAction = {
-              action: "removeMember",
-              payload: {
-                member: await getMember(ICVCMRoles, address),
-              },
-            };
-            break;
-        }
-      } else if (contractAddress === ContractAddresses.ICVCMConstitution) {
-        // They are constitution changes
-        const ICVCMConstitutionInterface =
-          ICVCMConstitution__factory.createInterface();
-        const fragment = ICVCMConstitutionInterface.getFunction(methodId);
-
-        switch (fragment) {
-          case ICVCMConstitutionInterface.functions["setPrinciples(string)"]:
-            var [principles] = ICVCMConstitutionInterface.decodeFunctionData(
-              fragment,
-              calldata
-            );
-            proposalAction = {
-              action: "editPrinciples",
-              payload: { principles },
-            };
-            break;
-          case ICVCMConstitutionInterface.functions["setStrategies(string)"]:
-            var [strategies] = ICVCMConstitutionInterface.decodeFunctionData(
-              fragment,
-              calldata
-            );
-            proposalAction = {
-              action: "editStrategies",
-              payload: { strategies },
-            };
-            break;
-        }
-      }
-
-      return {
-        proposalId: proposalId,
-        description: args.description,
-        state: await getProposalState(ICVCMGovernor, proposalId),
-        targets: args.targets,
-        calldatas: args.calldatas,
-        proposer: await getMember(ICVCMRoles, args.proposer),
-        time: new Date(block.timestamp * 1e3),
-        proposalAction,
-      };
-    })
+    proposals.map(async (proposalEvent) =>
+      parseProposalEvent(ICVCMGovernor, ICVCMRoles, proposalEvent)
+    )
   );
 };
 
@@ -265,6 +307,9 @@ export const executeProposal = async (
   await mutate("getProposals");
   await mutate(["getProposalExecutionEvent", proposal.proposalId]);
   await mutate(["getTotalVotesRequired", proposal.proposalId]);
+  await mutate("getPrinciplesHistory");
+  await mutate("getStrategiesHistory");
+  await mutate("getMemberHistory");
 };
 
 export const cancelProposal = async (

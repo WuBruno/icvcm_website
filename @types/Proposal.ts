@@ -9,6 +9,7 @@ export type Proposal = {
   proposer: Member;
   time: Date;
   proposalAction: ProposalAction;
+  deadline: Date;
 };
 
 export enum ProposalState {

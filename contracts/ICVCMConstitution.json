@@ -19,6 +19,44 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "currPrinciples",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "newPrinciples",
+        "type": "string"
+      }
+    ],
+    "name": "UpdatePrinciples",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "currStrategies",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "newStrategies",
+        "type": "string"
+      }
+    ],
+    "name": "UpdateStrategies",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "getPrinciples",
     "outputs": [
