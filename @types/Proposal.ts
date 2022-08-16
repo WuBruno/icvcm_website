@@ -56,8 +56,24 @@ type EditStrategiesAction = Action & {
   };
 };
 
+type SetVotingQuorum = Action & {
+  action: "setVotingQuorum";
+  payload: {
+    quorum: number;
+  };
+};
+
+type SetVotingPeriod = Action & {
+  action: "setVotingPeriod";
+  payload: {
+    votingPeriod: number;
+  };
+};
+
 export type ProposalAction =
   | AddMemberAction
   | RemoveMemberAction
   | EditPrinciplesAction
-  | EditStrategiesAction;
+  | EditStrategiesAction
+  | SetVotingQuorum
+  | SetVotingPeriod;

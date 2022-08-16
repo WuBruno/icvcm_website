@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { Proposal } from "~/@types";
 import { Roles } from "~/@types/Roles";
+import { parseBlockToDays } from "~/util";
 import ProposalHistory from "./ProposalHistory";
 
 type Props = {
@@ -69,6 +70,31 @@ const ProposalInfo = ({ proposal }: Props) => {
             <Typography>Proposed New Strategies: </Typography>
             <Typography paragraph variant="body2">
               {proposalAction.payload.strategies}
+            </Typography>
+          </Stack>
+        );
+      case "setVotingQuorum":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Set Voting Quorum</b>
+            </Typography>
+            <Typography>
+              Proposed New Voting Quorum: {proposalAction.payload.quorum}%
+            </Typography>
+          </Stack>
+        );
+
+      case "setVotingPeriod":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Set Voting Period</b>
+            </Typography>
+            <Typography>
+              Proposed New Voting Period:{" "}
+              {parseBlockToDays(proposalAction.payload.votingPeriod)} days ≈{" "}
+              {proposalAction.payload.votingPeriod} Blocks
             </Typography>
           </Stack>
         );

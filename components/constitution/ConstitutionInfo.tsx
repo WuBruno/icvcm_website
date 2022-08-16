@@ -17,9 +17,12 @@ import {
   getMemberHistory,
   getPrinciples,
   getPrinciplesHistory,
+  getSettingsHistory,
   getStrategies,
   getStrategiesHistory,
 } from "~/services/constitution";
+import { getQuorum, getVotingPeriod } from "~/services/proposals";
+import { parseBlockToDays, parseDaysToBlocks } from "~/util";
 import { MembersList } from "../members";
 import ConstitutionTimeline from "./ConstitutionTimeline";
 
@@ -46,6 +49,15 @@ function ConstitutionInfo({}: Props) {
   );
   const { data: memberHistory } = useSWR("getMemberHistory", async () =>
     getMemberHistory(ICVCMGovernor, ICVCMRoles)
+  );
+  const { data: quorum } = useSWR("getQuorum", async () =>
+    getQuorum(ICVCMGovernor)
+  );
+  const { data: period } = useSWR("getVotingPeriod", async () =>
+    getVotingPeriod(ICVCMGovernor)
+  );
+  const { data: settingsHistory } = useSWR("getSettingsHistory", async () =>
+    getSettingsHistory(ICVCMGovernor, ICVCMRoles)
   );
 
   return (
@@ -98,6 +110,7 @@ function ConstitutionInfo({}: Props) {
         </AccordionSummary>
 
         <AccordionDetails>
+          <Typography variant="h6">Current Members</Typography>
           <MembersList />
 
           <Typography variant="h6">Membership Changes</Typography>
@@ -118,6 +131,42 @@ function ConstitutionInfo({}: Props) {
             dotColor={(item) =>
               item.operation === "add" ? "success" : "error"
             }
+          />
+        </AccordionDetails>
+      </Accordion>
+
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Settings</Typography>
+        </AccordionSummary>
+
+        <AccordionDetails>
+          <Typography variant="h6">Current Governance Settings</Typography>
+          <Typography gutterBottom>
+            Voting Quorum: {quorum && quorum.toNumber()}%
+          </Typography>
+          <Typography gutterBottom>
+            Voting Period: {period} days ≈ {parseDaysToBlocks(period)} Blocks{" "}
+          </Typography>
+
+          <Typography variant="h6">Setting Changes</Typography>
+          <ConstitutionTimeline
+            items={settingsHistory}
+            keyExtractor={(item) => item.proposal?.proposalId ?? item.operation}
+            leftText={(item) => item.time.toLocaleString()}
+            rightHeading={(item) =>
+              item.proposal?.description || "Council Creation"
+            }
+            rightText={(item) => {
+              switch (item.operation) {
+                case "quorum":
+                  return `Set quorum to ${item.value}`;
+                case "period":
+                  return `Set voting period to ${parseBlockToDays(
+                    Number(item.value)
+                  )} Days ≈ ${item.value} Blocks`;
+              }
+            }}
           />
         </AccordionDetails>
       </Accordion>

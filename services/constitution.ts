@@ -26,6 +26,10 @@ export type MemberChanges = ConstitutionChange & {
   operation: "add" | "remove";
   member: Member;
 };
+export type SettingChanges = ConstitutionChange & {
+  type: "settings";
+  operation: "quorum" | "period";
+};
 
 export const getPrinciples = async (constitution: ICVCMConstitution) =>
   constitution.getPrinciples();
@@ -151,6 +155,57 @@ export const getMemberHistory = async (
   );
 
   return [...add, ...remove].sort(
+    (a, b) => b.time.getTime() - a.time.getTime()
+  );
+};
+
+export const getSettingsHistory = async (
+  governor: ICVCMGovernor,
+  roles: ICVCMRoles
+): Promise<SettingChanges[]> => {
+  const quorumFilter = governor.filters.QuorumNumeratorUpdated();
+  const quorumEvents = await governor.queryFilter(quorumFilter);
+
+  const periodFilter = governor.filters.VotingPeriodSet();
+  const periodEvents = await governor.queryFilter(periodFilter);
+
+  const governorInterface = ICVCMGovernor__factory.createInterface();
+
+  const quorum = await Promise.all(
+    quorumEvents.map(async (event): Promise<SettingChanges> => {
+      const block = await event.getBlock();
+      const txn = await event.getTransactionReceipt();
+      const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
+      const proposal = await getProposal(governor, roles, proposalId);
+
+      return {
+        value: `${event.args.newQuorumNumerator.toString()}`,
+        time: new Date(block.timestamp * 1e3),
+        proposal,
+        type: "settings",
+        operation: "quorum",
+      };
+    })
+  );
+
+  const period = await Promise.all(
+    periodEvents.map(async (event): Promise<SettingChanges> => {
+      const block = await event.getBlock();
+      const txn = await event.getTransactionReceipt();
+      const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
+      const proposal = await getProposal(governor, roles, proposalId);
+
+      return {
+        value: `${event.args.newVotingPeriod.toString()}`,
+        time: new Date(block.timestamp * 1e3),
+        proposal,
+        type: "settings",
+        operation: "period",
+      };
+    })
+  );
+
+  return [...quorum, ...period].sort(
     (a, b) => b.time.getTime() - a.time.getTime()
   );
 };

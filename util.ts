@@ -36,3 +36,19 @@ export const parseBalance = (
   decimals = 18,
   decimalsToDisplay = 3
 ) => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
+
+export const parseBlockToDays = (value: number) => {
+  return Math.round(
+    (value * (Number(process.env.NEXT_PUBLIC_BLOCK_INTERVAL) / 1e3)) /
+      60 /
+      60 /
+      24
+  );
+};
+
+export const parseDaysToBlocks = (value: number) => {
+  return Math.floor(
+    (value * 60 * 60 * 24) /
+      (Number(process.env.NEXT_PUBLIC_BLOCK_INTERVAL) / 1e3)
+  );
+};

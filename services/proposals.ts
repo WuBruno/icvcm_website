@@ -7,10 +7,12 @@ import {
   ICVCMConstitution,
   ICVCMConstitution__factory,
   ICVCMGovernor,
+  ICVCMGovernor__factory,
   ICVCMRoles,
   ICVCMToken,
 } from "~/contracts/types";
 import { ProposalCreatedEvent } from "~/contracts/types/Governor";
+import { parseBlockToDays } from "~/util";
 import { getMember } from "./members";
 
 export const propose = async (
@@ -113,6 +115,42 @@ export const proposeRemoveMember = async (
   );
 };
 
+export const proposeVotingQuorum = async (
+  ICVCMGovernor: ICVCMGovernor,
+  description: string,
+  quorum: number
+) => {
+  const encodedFunctionCall = ICVCMGovernor.interface.encodeFunctionData(
+    "updateQuorumNumerator",
+    [ethers.BigNumber.from(quorum)]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMGovernor.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeVotingPeriod = async (
+  ICVCMGovernor: ICVCMGovernor,
+  description: string,
+  votingPeriod: number
+) => {
+  const encodedFunctionCall = ICVCMGovernor.interface.encodeFunctionData(
+    "setVotingPeriod",
+    [votingPeriod]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMGovernor.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
 const parseProposalEvent = async (
   ICVCMGovernor: ICVCMGovernor,
   ICVCMRoles: ICVCMRoles,
@@ -187,6 +225,35 @@ const parseProposalEvent = async (
         proposalAction = {
           action: "editStrategies",
           payload: { strategies },
+        };
+        break;
+    }
+  } else if (contractAddress === ContractAddresses.ICVCMGovernor) {
+    const ICVCMGovernorInterface = ICVCMGovernor__factory.createInterface();
+    const fragment = ICVCMGovernorInterface.getFunction(methodId);
+
+    switch (fragment) {
+      case ICVCMGovernorInterface.functions["updateQuorumNumerator(uint256)"]:
+        var [quorum] = ICVCMGovernorInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+
+        proposalAction = {
+          action: "setVotingQuorum",
+          payload: { quorum: ethers.BigNumber.from(quorum).toNumber() },
+        };
+        break;
+      case ICVCMGovernorInterface.functions["setVotingPeriod(uint256)"]:
+        var [votingPeriod] = ICVCMGovernorInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "setVotingPeriod",
+          payload: {
+            votingPeriod: ethers.BigNumber.from(votingPeriod).toNumber(),
+          },
         };
         break;
     }
@@ -310,6 +377,7 @@ export const executeProposal = async (
   await mutate("getPrinciplesHistory");
   await mutate("getStrategiesHistory");
   await mutate("getMemberHistory");
+  await mutate("getQuorum");
 };
 
 export const cancelProposal = async (
@@ -335,4 +403,13 @@ export const getTotalVotesRequired = async (
 ) => {
   const blockNumber = await ICVCMGovernor.proposalSnapshot(proposalId);
   return ICVCMToken.getPastTotalSupply(blockNumber);
+};
+
+export const getQuorum = async (ICVCMGovernor: ICVCMGovernor) => {
+  return ICVCMGovernor.quorumNumerator();
+};
+
+export const getVotingPeriod = async (ICVCMGovernor: ICVCMGovernor) => {
+  const blocks = await ICVCMGovernor.votingPeriod();
+  return parseBlockToDays(blocks.toNumber());
 };

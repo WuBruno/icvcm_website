@@ -14,13 +14,15 @@ import AddMember from "./AddMember";
 import EditPrinciple from "./EditPrinciple";
 import EditStrategy from "./EditStrategy";
 import RemoveMember from "./RemoveMember";
+import VotingPeriod from "./VotingPeriod";
+import VotingQuorum from "./VotingQuorum";
 
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 500,
+  width: 1000,
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
@@ -32,6 +34,8 @@ enum ProposalType {
   EditStrategy,
   AddMember,
   RemoveMember,
+  VotingQuorum,
+  VotingPeriod,
 }
 
 const ProposeButton = () => {
@@ -65,6 +69,11 @@ const ProposeButton = () => {
 
       case ProposalType.RemoveMember:
         return <RemoveMember setOpen={setOpen} />;
+
+      case ProposalType.VotingQuorum:
+        return <VotingQuorum setOpen={setOpen} />;
+      case ProposalType.VotingPeriod:
+        return <VotingPeriod setOpen={setOpen} />;
 
       default:
         return null;
@@ -104,6 +113,12 @@ const ProposeButton = () => {
             </ToggleButton>
             <ToggleButton value={ProposalType.RemoveMember}>
               Remove Member
+            </ToggleButton>
+            <ToggleButton value={ProposalType.VotingQuorum}>
+              Voting Quorum
+            </ToggleButton>
+            <ToggleButton value={ProposalType.VotingPeriod}>
+              Voting Period
             </ToggleButton>
           </ToggleButtonGroup>
 
