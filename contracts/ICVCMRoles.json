@@ -80,6 +80,56 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "selector",
+        "type": "bytes4"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum Role",
+        "name": "role",
+        "type": "uint8"
+      }
+    ],
+    "name": "ProposalAuthorizationAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "selector",
+        "type": "bytes4"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum Role",
+        "name": "role",
+        "type": "uint8"
+      }
+    ],
+    "name": "ProposalAuthorizationRemoved",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -98,6 +148,52 @@
       }
     ],
     "name": "addMember",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes4",
+        "name": "selector",
+        "type": "bytes4"
+      },
+      {
+        "internalType": "enum Role",
+        "name": "role",
+        "type": "uint8"
+      }
+    ],
+    "name": "addProposalAuthorization",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "contracts",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bytes4[]",
+        "name": "selectors",
+        "type": "bytes4[]"
+      },
+      {
+        "internalType": "enum Role[]",
+        "name": "roles",
+        "type": "uint8[]"
+      }
+    ],
+    "name": "batchAddProposalAuthorization",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -181,6 +277,65 @@
         "type": "uint8"
       }
     ],
+    "name": "getProposalAuthorization",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getProposalAuthorizations",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "contractAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes4",
+            "name": "selector",
+            "type": "bytes4"
+          },
+          {
+            "internalType": "enum Role",
+            "name": "role",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct ProposalAuthorization[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes4",
+        "name": "selector",
+        "type": "bytes4"
+      },
+      {
+        "internalType": "enum Role",
+        "name": "role",
+        "type": "uint8"
+      }
+    ],
     "name": "hasProposalAuthorization",
     "outputs": [
       {
@@ -219,36 +374,31 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "renounceOwnership",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes4",
+        "name": "selector",
+        "type": "bytes4"
+      },
+      {
+        "internalType": "enum Role",
+        "name": "role",
+        "type": "uint8"
+      }
+    ],
+    "name": "removeProposalAuthorization",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "contracts",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bytes4[]",
-        "name": "selectors",
-        "type": "bytes4[]"
-      },
-      {
-        "internalType": "enum Role[]",
-        "name": "roles",
-        "type": "uint8[]"
-      },
-      {
-        "internalType": "bool[]",
-        "name": "allow",
-        "type": "bool[]"
-      }
-    ],
-    "name": "setProposalAuthorization",
+    "inputs": [],
+    "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

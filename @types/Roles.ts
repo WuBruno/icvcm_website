@@ -10,3 +10,15 @@ export type Member = {
   name: string;
   memberAddress: string;
 };
+
+export enum Contracts {
+  ICVCMRoles,
+  ICVCMGovernor,
+  ICVCMConstitution,
+}
+
+export type ProposalAuthorization = {
+  role: Roles;
+  contract: Contracts;
+  function: string;
+};

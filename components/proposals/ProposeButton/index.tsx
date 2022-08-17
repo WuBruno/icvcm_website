@@ -11,9 +11,11 @@ import { Roles } from "~/@types/Roles";
 import { useUser } from "~/hooks/common";
 
 import AddMember from "./AddMember";
+import AddProposalAuthorization from "./AddProposalAuthorization";
 import EditPrinciple from "./EditPrinciple";
 import EditStrategy from "./EditStrategy";
 import RemoveMember from "./RemoveMember";
+import { default as RemoveProposalAuthorization } from "./RemoveProposalAuthorization";
 import VotingPeriod from "./VotingPeriod";
 import VotingQuorum from "./VotingQuorum";
 
@@ -36,6 +38,8 @@ enum ProposalType {
   RemoveMember,
   VotingQuorum,
   VotingPeriod,
+  AddProposalAuthorization,
+  RemoveProposalAuthorization,
 }
 
 const ProposeButton = () => {
@@ -60,20 +64,20 @@ const ProposeButton = () => {
     switch (proposalType) {
       case ProposalType.EditPrinciple:
         return <EditPrinciple setOpen={setOpen} />;
-
       case ProposalType.EditStrategy:
         return <EditStrategy setOpen={setOpen} />;
-
       case ProposalType.AddMember:
         return <AddMember setOpen={setOpen} />;
-
       case ProposalType.RemoveMember:
         return <RemoveMember setOpen={setOpen} />;
-
       case ProposalType.VotingQuorum:
         return <VotingQuorum setOpen={setOpen} />;
       case ProposalType.VotingPeriod:
         return <VotingPeriod setOpen={setOpen} />;
+      case ProposalType.AddProposalAuthorization:
+        return <AddProposalAuthorization setOpen={setOpen} />;
+      case ProposalType.RemoveProposalAuthorization:
+        return <RemoveProposalAuthorization setOpen={setOpen} />;
 
       default:
         return null;
@@ -109,7 +113,7 @@ const ProposeButton = () => {
               Strategic Decisions
             </ToggleButton>
             <ToggleButton value={ProposalType.AddMember}>
-              New Member
+              Add Member
             </ToggleButton>
             <ToggleButton value={ProposalType.RemoveMember}>
               Remove Member
@@ -119,6 +123,12 @@ const ProposeButton = () => {
             </ToggleButton>
             <ToggleButton value={ProposalType.VotingPeriod}>
               Voting Period
+            </ToggleButton>
+            <ToggleButton value={ProposalType.AddProposalAuthorization}>
+              Add Proposal Authorization
+            </ToggleButton>
+            <ToggleButton value={ProposalType.RemoveProposalAuthorization}>
+              Remove Proposal Authorization
             </ToggleButton>
           </ToggleButtonGroup>
 

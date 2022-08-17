@@ -25,6 +25,7 @@ import { getQuorum, getVotingPeriod } from "~/services/proposals";
 import { parseBlockToDays, parseDaysToBlocks } from "~/util";
 import { MembersList } from "../members";
 import ConstitutionTimeline from "./ConstitutionTimeline";
+import ProposalAuthorizationList from "./ProposalAuthorizationList";
 
 type Props = {};
 
@@ -41,23 +42,35 @@ function ConstitutionInfo({}: Props) {
     ICVCMConstitution ? "strategies" : null,
     async () => getStrategies(ICVCMConstitution)
   );
-  const { data: principlesHistory } = useSWR("getPrinciplesHistory", async () =>
-    getPrinciplesHistory(ICVCMGovernor, ICVCMRoles, ICVCMConstitution)
+  const { data: principlesHistory } = useSWR(
+    ICVCMGovernor && ICVCMRoles && ICVCMConstitution
+      ? "getPrinciplesHistory"
+      : null,
+    async () =>
+      getPrinciplesHistory(ICVCMGovernor, ICVCMRoles, ICVCMConstitution)
   );
-  const { data: strategiesHistory } = useSWR("getStrategiesHistory", async () =>
-    getStrategiesHistory(ICVCMGovernor, ICVCMRoles, ICVCMConstitution)
+  const { data: strategiesHistory } = useSWR(
+    ICVCMGovernor && ICVCMRoles && ICVCMConstitution
+      ? "getStrategiesHistory"
+      : null,
+    async () =>
+      getStrategiesHistory(ICVCMGovernor, ICVCMRoles, ICVCMConstitution)
   );
-  const { data: memberHistory } = useSWR("getMemberHistory", async () =>
-    getMemberHistory(ICVCMGovernor, ICVCMRoles)
+  const { data: memberHistory } = useSWR(
+    ICVCMGovernor && ICVCMRoles ? "getMemberHistory" : null,
+    async () => getMemberHistory(ICVCMGovernor, ICVCMRoles)
   );
-  const { data: quorum } = useSWR("getQuorum", async () =>
-    getQuorum(ICVCMGovernor)
+  const { data: quorum } = useSWR(
+    ICVCMGovernor ? "getQuorum" : null,
+    async () => getQuorum(ICVCMGovernor)
   );
-  const { data: period } = useSWR("getVotingPeriod", async () =>
-    getVotingPeriod(ICVCMGovernor)
+  const { data: period } = useSWR(
+    ICVCMGovernor ? "getVotingPeriod" : null,
+    async () => getVotingPeriod(ICVCMGovernor)
   );
-  const { data: settingsHistory } = useSWR("getSettingsHistory", async () =>
-    getSettingsHistory(ICVCMGovernor, ICVCMRoles)
+  const { data: settingsHistory, error } = useSWR(
+    ICVCMGovernor && ICVCMRoles ? "getSettingsHistory" : null,
+    async () => getSettingsHistory(ICVCMGovernor, ICVCMRoles)
   );
 
   return (
@@ -148,15 +161,28 @@ function ConstitutionInfo({}: Props) {
           <Typography gutterBottom>
             Voting Period: {period} days ≈ {parseDaysToBlocks(period)} Blocks{" "}
           </Typography>
+          <ProposalAuthorizationList />
 
           <Typography variant="h6">Setting Changes</Typography>
           <ConstitutionTimeline
             items={settingsHistory}
-            keyExtractor={(item) => item.proposal?.proposalId ?? item.operation}
+            keyExtractor={(item) =>
+              item.proposal?.proposalId ?? item.value + item.type
+            }
             leftText={(item) => item.time.toLocaleString()}
             rightHeading={(item) =>
               item.proposal?.description || "Council Creation"
             }
+            dotColor={(item) => {
+              switch (item.operation) {
+                case "addProposalAuthorization":
+                  return "success";
+                case "removeProposalAuthorization":
+                  return "error";
+                default:
+                  return "warning";
+              }
+            }}
             rightText={(item) => {
               switch (item.operation) {
                 case "quorum":
@@ -165,6 +191,8 @@ function ConstitutionInfo({}: Props) {
                   return `Set voting period to ${parseBlockToDays(
                     Number(item.value)
                   )} Days ≈ ${item.value} Blocks`;
+                default:
+                  return item.value;
               }
             }}
           />

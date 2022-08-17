@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { Proposal } from "~/@types";
 import { Roles } from "~/@types/Roles";
+import { parseFunctionName } from "~/services/members";
 import { parseBlockToDays } from "~/util";
 import ProposalHistory from "./ProposalHistory";
 
@@ -95,6 +96,37 @@ const ProposalInfo = ({ proposal }: Props) => {
               Proposed New Voting Period:{" "}
               {parseBlockToDays(proposalAction.payload.votingPeriod)} days ≈{" "}
               {proposalAction.payload.votingPeriod} Blocks
+            </Typography>
+          </Stack>
+        );
+      case "addProposalAuthorization":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Add Proposal Authorization</b>
+            </Typography>
+            <Typography>Role Authorization Added:</Typography>
+            <Typography variant="body2">
+              Proposal Type: {proposalAction.payload.function}
+            </Typography>
+            <Typography variant="body2">
+              Role: <b>{Roles[proposalAction.payload.role]}</b>
+            </Typography>
+          </Stack>
+        );
+      case "removeProposalAuthorization":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Remove Proposal Authorization</b>
+            </Typography>
+            <Typography>Role Authorization Removed:</Typography>
+            <Typography variant="body2">
+              Proposal Type:{" "}
+              {parseFunctionName(proposalAction.payload.function)}
+            </Typography>
+            <Typography variant="body2">
+              Role: <b>{Roles[proposalAction.payload.role]}</b>
             </Typography>
           </Stack>
         );

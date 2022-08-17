@@ -1,7 +1,7 @@
 import { BigNumberish, ethers } from "ethers";
 import { mutate } from "swr";
 import { Proposal, ProposalAction, ProposalState } from "~/@types";
-import { Roles } from "~/@types/Roles";
+import { Contracts, ProposalAuthorization, Roles } from "~/@types/Roles";
 import ContractAddresses from "~/contract.json";
 import {
   ICVCMConstitution,
@@ -9,11 +9,12 @@ import {
   ICVCMGovernor,
   ICVCMGovernor__factory,
   ICVCMRoles,
+  ICVCMRoles__factory,
   ICVCMToken,
 } from "~/contracts/types";
 import { ProposalCreatedEvent } from "~/contracts/types/Governor";
 import { parseBlockToDays } from "~/util";
-import { getMember } from "./members";
+import { getMember, parseProposalAuthorization } from "./members";
 
 export const propose = async (
   ICVCMGovernor: ICVCMGovernor,
@@ -151,6 +152,81 @@ export const proposeVotingPeriod = async (
   );
 };
 
+export const proposeAddProposalAuthorization = async (
+  ICVCMGovernor: ICVCMGovernor,
+  description: string,
+  proposalAuthorization: ProposalAuthorization
+) => {
+  const [contractAddress, selector, role] = prepareProposalAuthorization(
+    proposalAuthorization
+  );
+  const encodedFunctionCall =
+    ICVCMRoles__factory.createInterface().encodeFunctionData(
+      "addProposalAuthorization",
+      [contractAddress, selector, role]
+    );
+
+  return propose(
+    ICVCMGovernor,
+    ContractAddresses.ICVCMRoles,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeRemoveProposalAuthorization = async (
+  ICVCMGovernor: ICVCMGovernor,
+  description: string,
+  proposalAuthorization: ProposalAuthorization
+) => {
+  const [contractAddress, selector, role] = prepareProposalAuthorization(
+    proposalAuthorization
+  );
+  const encodedFunctionCall =
+    ICVCMRoles__factory.createInterface().encodeFunctionData(
+      "removeProposalAuthorization",
+      [contractAddress, selector, role]
+    );
+
+  return propose(
+    ICVCMGovernor,
+    ContractAddresses.ICVCMRoles,
+    encodedFunctionCall,
+    description
+  );
+};
+
+const prepareProposalAuthorization = (
+  proposalAuthorization: ProposalAuthorization
+) => {
+  let contractAddress: string;
+  let selector: string;
+  switch (proposalAuthorization.contract) {
+    case Contracts.ICVCMConstitution:
+      contractAddress = ContractAddresses.ICVCMConstitution;
+      selector = ICVCMConstitution__factory.createInterface().getSighash(
+        proposalAuthorization.function
+      );
+      break;
+    case Contracts.ICVCMGovernor:
+      contractAddress = ContractAddresses.ICVCMGovernor;
+      selector = ICVCMGovernor__factory.createInterface().getSighash(
+        proposalAuthorization.function
+      );
+      break;
+    case Contracts.ICVCMRoles:
+      contractAddress = ContractAddresses.ICVCMRoles;
+      selector = ICVCMRoles__factory.createInterface().getSighash(
+        proposalAuthorization.function
+      );
+      break;
+
+    default:
+      break;
+  }
+  return [contractAddress, selector, proposalAuthorization.role] as const;
+};
+
 const parseProposalEvent = async (
   ICVCMGovernor: ICVCMGovernor,
   ICVCMRoles: ICVCMRoles,
@@ -197,6 +273,30 @@ const parseProposalEvent = async (
           payload: {
             member: await getMember(ICVCMRoles, address),
           },
+        };
+        break;
+      case ICVCMRolesInterface.functions[
+        "addProposalAuthorization(address,bytes4,uint8)"
+      ]:
+        var [address, selector, role] = ICVCMRolesInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "addProposalAuthorization",
+          payload: parseProposalAuthorization(address, selector, role),
+        };
+        break;
+      case ICVCMRolesInterface.functions[
+        "removeProposalAuthorization(address,bytes4,uint8)"
+      ]:
+        var [address, selector, role] = ICVCMRolesInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "removeProposalAuthorization",
+          payload: parseProposalAuthorization(address, selector, role),
         };
         break;
     }
@@ -371,6 +471,8 @@ export const executeProposal = async (
   );
   await tx.wait();
 
+  await mutate("principles");
+  await mutate("strategies");
   await mutate("getProposals");
   await mutate(["getProposalExecutionEvent", proposal.proposalId]);
   await mutate(["getTotalVotesRequired", proposal.proposalId]);
@@ -378,6 +480,9 @@ export const executeProposal = async (
   await mutate("getStrategiesHistory");
   await mutate("getMemberHistory");
   await mutate("getQuorum");
+  await mutate("getVotingPeriod");
+  await mutate("getSettingsHistory");
+  await mutate("getProposalAuthorizations");
 };
 
 export const cancelProposal = async (

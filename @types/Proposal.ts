@@ -1,4 +1,4 @@
-import { Member } from "./Roles";
+import { Member, ProposalAuthorization } from "./Roles";
 
 export type Proposal = {
   proposalId: string;
@@ -70,10 +70,22 @@ type SetVotingPeriod = Action & {
   };
 };
 
+type AddProposalAuthorization = Action & {
+  action: "addProposalAuthorization";
+  payload: ProposalAuthorization;
+};
+
+type RemoveProposalAuthorization = Action & {
+  action: "removeProposalAuthorization";
+  payload: ProposalAuthorization;
+};
+
 export type ProposalAction =
   | AddMemberAction
   | RemoveMemberAction
   | EditPrinciplesAction
   | EditStrategiesAction
   | SetVotingQuorum
-  | SetVotingPeriod;
+  | SetVotingPeriod
+  | AddProposalAuthorization
+  | RemoveProposalAuthorization;

@@ -17,7 +17,7 @@ import { proposeAddMember } from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };
 
-function EditPrinciple({ setOpen }: Props) {
+function AddMember({ setOpen }: Props) {
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState(Roles.Director);
@@ -97,4 +97,4 @@ function EditPrinciple({ setOpen }: Props) {
   );
 }
 
-export default EditPrinciple;
+export default AddMember;

@@ -13,7 +13,7 @@ import { proposeStrategy } from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };
 
-function EditPrinciple({ setOpen }: Props) {
+function EditStrategy({ setOpen }: Props) {
   const [description, setDescription] = useState("");
   const [strategies, setStrategies] = useState("");
   const ICVCMGovernor = useICVCMGovernor();
@@ -77,4 +77,4 @@ function EditPrinciple({ setOpen }: Props) {
   );
 }
 
-export default EditPrinciple;
+export default EditStrategy;

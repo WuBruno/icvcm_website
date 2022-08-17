@@ -7,30 +7,37 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { ethers } from "ethers";
 import React, { useState } from "react";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
 import { useAsync } from "~/hooks/common";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
-import { getMembers } from "~/services/members";
-import { proposeRemoveMember } from "~/services/proposals";
+import {
+  getProposalAuthorizations,
+  parseFunctionName,
+} from "~/services/members";
+import { proposeRemoveProposalAuthorization } from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };
 
-function RemoveMember({ setOpen }: Props) {
+function RemoveProposalAuthorization({ setOpen }: Props) {
   const [description, setDescription] = useState("");
-  const [address, setAddress] = useState("");
+  const [index, setIndex] = useState<number>(0);
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();
   const [_, submit] = useAsync(submitProposal);
-  const { data: members } = useSWR(ICVCMRoles ? "members" : null, async () =>
-    getMembers(ICVCMRoles)
+  const { data: proposalAuthorizations } = useSWR(
+    ICVCMRoles ? "getProposalAuthorizations" : null,
+    async () => getProposalAuthorizations(ICVCMRoles)
   );
 
   async function submitProposal() {
     setOpen(false);
-    return proposeRemoveMember(ICVCMGovernor, ICVCMRoles, description, address);
+    return proposeRemoveProposalAuthorization(
+      ICVCMGovernor,
+      description,
+      proposalAuthorizations[index]
+    );
   }
 
   const handleChangeDescription = (
@@ -40,7 +47,7 @@ function RemoveMember({ setOpen }: Props) {
   };
 
   const handleChangeAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(event.target.value);
+    setIndex(Number(event.target.value));
   };
 
   return (
@@ -52,18 +59,24 @@ function RemoveMember({ setOpen }: Props) {
       />
 
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Member</InputLabel>
+        <InputLabel id="demo-simple-select-label">
+          Proposal Authorization
+        </InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={address}
-          label="Member"
+          value={index}
+          label="Proposal Authorization"
           onChange={handleChangeAddress}
         >
-          {members.map((member) => (
-            <MenuItem key={member.memberAddress} value={member.memberAddress}>
-              {ethers.utils.parseBytes32String(member.name)} -{" "}
-              {Roles[member.role]}
+          {proposalAuthorizations?.map((item, i) => (
+            <MenuItem
+              key={
+                item.function + item.contract.toString() + item.role.toString()
+              }
+              value={i}
+            >
+              {Roles[item.role]} to {parseFunctionName(item.function)}
             </MenuItem>
           ))}
         </Select>
@@ -76,4 +89,4 @@ function RemoveMember({ setOpen }: Props) {
   );
 }
 
-export default RemoveMember;
+export default RemoveProposalAuthorization;
