@@ -6,9 +6,11 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
-import { Roles } from "~/@types/Roles";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
 import { useUser } from "~/hooks/common";
+import { useICVCMRoles } from "~/hooks/contracts";
+import { getProposalAuthorizations } from "~/services/members";
 
 import AddMember from "./AddMember";
 import AddProposalAuthorization from "./AddProposalAuthorization";
@@ -47,11 +49,19 @@ const ProposeButton = () => {
   const [proposalType, setProposalType] = useState<ProposalType>(
     ProposalType.EditPrinciple
   );
-
+  const ICVCMRoles = useICVCMRoles();
+  const { data } = useSWR(
+    ICVCMRoles ? "getProposalAuthorizations" : null,
+    async () => getProposalAuthorizations(ICVCMRoles)
+  );
   const { user } = useUser();
-  const canPropose =
-    !user ||
-    ![Roles.Director, Roles.Expert, Roles.Secretariat].includes(user.role);
+  const authorizations = useMemo(() => {
+    if (user && data) {
+      return data.filter((p) => p.role == user.role).map((p) => p.function);
+    }
+    return;
+  }, [user, data]);
+  console.log(authorizations);
 
   const handleChangeProposalType = (
     event: React.MouseEvent<HTMLElement>,
@@ -90,7 +100,7 @@ const ProposeButton = () => {
         variant="contained"
         sx={{ marginY: 2 }}
         onClick={() => setOpen(true)}
-        disabled={canPropose}
+        disabled={!authorizations.length}
       >
         Create Proposal
       </Button>
@@ -106,28 +116,54 @@ const ProposeButton = () => {
             exclusive
             onChange={handleChangeProposalType}
           >
-            <ToggleButton value={ProposalType.EditPrinciple}>
+            <ToggleButton
+              value={ProposalType.EditPrinciple}
+              disabled={!authorizations?.includes("setPrinciples")}
+            >
               Carbon Credit Principles
             </ToggleButton>
-            <ToggleButton value={ProposalType.EditStrategy}>
+            <ToggleButton
+              value={ProposalType.EditStrategy}
+              disabled={!authorizations?.includes("setStrategies")}
+            >
               Strategic Decisions
             </ToggleButton>
-            <ToggleButton value={ProposalType.AddMember}>
+            <ToggleButton
+              value={ProposalType.AddMember}
+              disabled={!authorizations?.includes("addMember")}
+            >
               Add Member
             </ToggleButton>
-            <ToggleButton value={ProposalType.RemoveMember}>
+            <ToggleButton
+              value={ProposalType.RemoveMember}
+              disabled={!authorizations?.includes("removeMember")}
+            >
               Remove Member
             </ToggleButton>
-            <ToggleButton value={ProposalType.VotingQuorum}>
+            <ToggleButton
+              value={ProposalType.VotingQuorum}
+              disabled={!authorizations?.includes("updateQuorumNumerator")}
+            >
               Voting Quorum
             </ToggleButton>
-            <ToggleButton value={ProposalType.VotingPeriod}>
+            <ToggleButton
+              value={ProposalType.VotingPeriod}
+              disabled={!authorizations?.includes("setVotingPeriod")}
+            >
               Voting Period
             </ToggleButton>
-            <ToggleButton value={ProposalType.AddProposalAuthorization}>
+            <ToggleButton
+              value={ProposalType.AddProposalAuthorization}
+              disabled={!authorizations?.includes("addProposalAuthorization")}
+            >
               Add Proposal Authorization
             </ToggleButton>
-            <ToggleButton value={ProposalType.RemoveProposalAuthorization}>
+            <ToggleButton
+              value={ProposalType.RemoveProposalAuthorization}
+              disabled={
+                !authorizations?.includes("removeProposalAuthorization")
+              }
+            >
               Remove Proposal Authorization
             </ToggleButton>
           </ToggleButtonGroup>
