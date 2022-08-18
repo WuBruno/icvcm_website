@@ -100,7 +100,7 @@ const ProposeButton = () => {
         variant="contained"
         sx={{ marginY: 2 }}
         onClick={() => setOpen(true)}
-        disabled={!authorizations.length}
+        disabled={!authorizations?.length}
       >
         Create Proposal
       </Button>

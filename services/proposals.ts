@@ -511,7 +511,7 @@ export const getTotalVotesRequired = async (
 };
 
 export const getQuorum = async (ICVCMGovernor: ICVCMGovernor) => {
-  return ICVCMGovernor.quorumNumerator();
+  return ICVCMGovernor["quorumNumerator()"]();
 };
 
 export const getVotingPeriod = async (ICVCMGovernor: ICVCMGovernor) => {
