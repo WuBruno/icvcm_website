@@ -39,14 +39,14 @@ export const propose = async (
   return proposalId;
 };
 
-export const proposePrinciple = async (
+export const proposeAddPrinciple = async (
   ICVCMGovernor: ICVCMGovernor,
   ICVCMConstitution: ICVCMConstitution,
-  newPrinciples: string,
-  description: string
+  description: string,
+  newPrinciples: string
 ) => {
   const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
-    "setPrinciples",
+    "addPrinciple",
     [newPrinciples]
   );
 
@@ -58,15 +58,93 @@ export const proposePrinciple = async (
   );
 };
 
-export const proposeStrategy = async (
+export const proposeUpdatePrinciple = async (
   ICVCMGovernor: ICVCMGovernor,
   ICVCMConstitution: ICVCMConstitution,
-  newStrategies: string,
-  description: string
+  description: string,
+  proposalId: number,
+  newPrinciples: string
 ) => {
   const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
-    "setStrategies",
-    [newStrategies]
+    "updatePrinciple",
+    [proposalId, newPrinciples]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMConstitution.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeRemovePrinciple = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMConstitution: ICVCMConstitution,
+  description: string,
+  principleId: number
+) => {
+  const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
+    "removePrinciple",
+    [principleId]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMConstitution.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeAddStrategy = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMConstitution: ICVCMConstitution,
+  description: string,
+  newStrategy: string
+) => {
+  const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
+    "addStrategy",
+    [newStrategy]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMConstitution.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeUpdateStrategy = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMConstitution: ICVCMConstitution,
+  description: string,
+  strategyId: number,
+  newStrategy: string
+) => {
+  const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
+    "updateStrategy",
+    [strategyId, newStrategy]
+  );
+
+  return propose(
+    ICVCMGovernor,
+    ICVCMConstitution.address,
+    encodedFunctionCall,
+    description
+  );
+};
+
+export const proposeRemoveStrategy = async (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMConstitution: ICVCMConstitution,
+  description: string,
+  strategyId: number
+) => {
+  const encodedFunctionCall = ICVCMConstitution.interface.encodeFunctionData(
+    "removeStrategy",
+    [strategyId]
   );
 
   return propose(
@@ -371,24 +449,70 @@ const parseProposalEvent = async (
     const fragment = ICVCMConstitutionInterface.getFunction(methodId);
 
     switch (fragment) {
-      case ICVCMConstitutionInterface.functions["setPrinciples(string)"]:
-        var [principles] = ICVCMConstitutionInterface.decodeFunctionData(
+      case ICVCMConstitutionInterface.functions["addPrinciple(string)"]:
+        var [principle] = ICVCMConstitutionInterface.decodeFunctionData(
           fragment,
           calldata
         );
         proposalAction = {
-          action: "editPrinciples",
-          payload: { principles },
+          action: "addPrinciple",
+          payload: { principle },
         };
         break;
-      case ICVCMConstitutionInterface.functions["setStrategies(string)"]:
-        var [strategies] = ICVCMConstitutionInterface.decodeFunctionData(
+      case ICVCMConstitutionInterface.functions[
+        "updatePrinciple(uint256,string)"
+      ]:
+        var [id, principle] = ICVCMConstitutionInterface.decodeFunctionData(
           fragment,
           calldata
         );
         proposalAction = {
-          action: "editStrategies",
-          payload: { strategies },
+          action: "updatePrinciple",
+          payload: { id, principle },
+        };
+        break;
+      case ICVCMConstitutionInterface.functions["removePrinciple(uint256)"]:
+        var [id] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "removePrinciple",
+          payload: { id },
+        };
+        break;
+      case ICVCMConstitutionInterface.functions["addStrategy(string)"]:
+        var [strategy] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "addStrategy",
+          payload: { strategy },
+        };
+        break;
+      case ICVCMConstitutionInterface.functions[
+        "updateStrategy(uint256,string)"
+      ]:
+        var [id, strategy] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "updateStrategy",
+          payload: { id, strategy },
+        };
+        break;
+      case ICVCMConstitutionInterface.functions[
+        "removeStrategy(uint256,string)"
+      ]:
+        var [id] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "removeStrategy",
+          payload: { id },
         };
         break;
       case ICVCMConstitutionInterface.functions["upgradeTo(address)"]:

@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { Proposal, ProposalState } from "~/@types";
 import { Roles } from "~/@types/Roles";
 import { useAsync, useUser } from "~/hooks/common";
@@ -25,7 +25,7 @@ function ExecuteProposalButton({ proposal }: Props) {
   switch (proposal.state) {
     case ProposalState.Succeeded:
       return (
-        <div>
+        <Stack direction="row" justifyContent="flex-end" spacing={1}>
           <Button
             disabled={!isRegulator}
             variant="contained"
@@ -36,13 +36,13 @@ function ExecuteProposalButton({ proposal }: Props) {
           </Button>
           <Button
             disabled={!isRegulator}
-            variant="contained"
-            color="success"
+            variant="outlined"
+            color="error"
             onClick={() => executeCancel()}
           >
             Cancel
           </Button>
-        </div>
+        </Stack>
       );
     case ProposalState.Defeated:
       return (

@@ -50,27 +50,75 @@ const ProposalInfo = ({ proposal }: Props) => {
             </Typography>
           </Stack>
         );
-      case "editPrinciples":
+      case "addPrinciple":
         return (
           <Stack>
             <Typography gutterBottom>
-              Action: <b>Editing Principles</b>
+              Action: <b>Add New CCP</b>
             </Typography>
-            <Typography>Proposed Principles: </Typography>
+            <Typography>Proposed Principle: </Typography>
             <Typography paragraph variant="body2">
-              {proposalAction.payload.principles}
+              {proposalAction.payload.principle}
             </Typography>
           </Stack>
         );
-      case "editStrategies":
+      case "updatePrinciple":
         return (
           <Stack>
             <Typography gutterBottom>
-              Action: <b>Editing Strategies</b>
+              Action: <b>Update Existing CCP</b>
             </Typography>
-            <Typography>Proposed New Strategies: </Typography>
+            <Typography>Proposed Update: </Typography>
             <Typography paragraph variant="body2">
-              {proposalAction.payload.strategies}
+              {proposalAction.payload.id.toString()}:
+              {proposalAction.payload.principle}
+            </Typography>
+          </Stack>
+        );
+      case "removePrinciple":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Remove CCP</b>
+            </Typography>
+            <Typography paragraph variant="body2">
+              Remove CCP ID:{proposalAction.payload.id.toString()}:
+            </Typography>
+          </Stack>
+        );
+      case "addStrategy":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Add New Strategy</b>
+            </Typography>
+            <Typography>Proposed New Strategy: </Typography>
+            <Typography paragraph variant="body2">
+              {proposalAction.payload.strategy}
+            </Typography>
+          </Stack>
+        );
+      case "updateStrategy":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Update Existing Strategy</b>
+            </Typography>
+            <Typography>Proposed Update: </Typography>
+            <Typography paragraph variant="body2">
+              {proposalAction.payload.id.toString()}:
+              {proposalAction.payload.strategy}
+            </Typography>
+          </Stack>
+        );
+      case "removeStrategy":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Remove Strategy</b>
+            </Typography>
+            <Typography paragraph variant="body2">
+              Remove Strategy ID:{proposalAction.payload.id.toString()}:
             </Typography>
           </Stack>
         );

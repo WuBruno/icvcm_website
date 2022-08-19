@@ -12,7 +12,9 @@ import { useUser } from "~/hooks/common";
 import { useICVCMRoles } from "~/hooks/contracts";
 import { getProposalAuthorizations } from "~/services/members";
 import CouncilMembers from "./CouncilMembers";
+import Principles from "./Principles";
 import ProposalAuthorization from "./ProposalAuthorization";
+import Strategies from "./Strategies";
 import UpgradeContract from "./UpgradeContract";
 import VotingParameters from "./VotingParameters";
 
@@ -59,10 +61,10 @@ const ProposeButton = () => {
 
   const ProposalComponent = () => {
     switch (proposalCategory) {
-      // case ProposalCategory.Principles:
-      //   return <EditPrinciple setOpen={setOpen} />;
-      // case ProposalCategory.Strategies:
-      //   return <EditStrategy setOpen={setOpen} />;
+      case ProposalCategory.Principles:
+        return <Principles setOpen={setOpen} />;
+      case ProposalCategory.Strategies:
+        return <Strategies setOpen={setOpen} />;
       case ProposalCategory.CouncilMembers:
         return <CouncilMembers setOpen={setOpen} />;
       case ProposalCategory.VotingParameters:
@@ -101,13 +103,21 @@ const ProposeButton = () => {
           >
             <ToggleButton
               value={ProposalCategory.Principles}
-              disabled={!authorizations?.includes("setPrinciples")}
+              disabled={
+                !authorizations?.includes("addPrinciple") &&
+                !authorizations?.includes("updatePrinciple") &&
+                !authorizations?.includes("deletePrinciple")
+              }
             >
               Carbon Credit Principles
             </ToggleButton>
             <ToggleButton
               value={ProposalCategory.Strategies}
-              disabled={!authorizations?.includes("setStrategies")}
+              disabled={
+                !authorizations?.includes("addStrategy") &&
+                !authorizations?.includes("updateStrategy") &&
+                !authorizations?.includes("deleteStrategy")
+              }
             >
               Strategic Decisions
             </ToggleButton>

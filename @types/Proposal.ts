@@ -42,17 +42,47 @@ type RemoveMemberAction = Action & {
   };
 };
 
-type EditPrinciplesAction = Action & {
-  action: "editPrinciples";
+type AddPrincipleAction = Action & {
+  action: "addPrinciple";
   payload: {
-    principles: string;
+    principle: string;
   };
 };
 
-type EditStrategiesAction = Action & {
-  action: "editStrategies";
+type UpdatePrincipleAction = Action & {
+  action: "updatePrinciple";
   payload: {
-    strategies: string;
+    id: number;
+    principle: string;
+  };
+};
+
+type RemovePrincipleAction = Action & {
+  action: "removePrinciple";
+  payload: {
+    id: number;
+  };
+};
+
+type AddStrategyAction = Action & {
+  action: "addStrategy";
+  payload: {
+    strategy: string;
+  };
+};
+
+type UpdateStrategyAction = Action & {
+  action: "updateStrategy";
+  payload: {
+    id: number;
+    strategy: string;
+  };
+};
+
+type RemoveStrategyAction = Action & {
+  action: "removeStrategy";
+  payload: {
+    id: number;
   };
 };
 
@@ -91,8 +121,12 @@ type UpgradeContract = Action & {
 export type ProposalAction =
   | AddMemberAction
   | RemoveMemberAction
-  | EditPrinciplesAction
-  | EditStrategiesAction
+  | AddPrincipleAction
+  | UpdatePrincipleAction
+  | RemovePrincipleAction
+  | AddStrategyAction
+  | UpdateStrategyAction
+  | RemoveStrategyAction
   | SetVotingQuorum
   | SetVotingPeriod
   | AddProposalAuthorization

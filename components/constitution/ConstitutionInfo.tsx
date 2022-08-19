@@ -4,6 +4,13 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
 import useSWR from "swr";
@@ -95,14 +102,49 @@ function ConstitutionInfo({}: Props) {
 
         <AccordionDetails>
           <Typography variant="h5">Current CCPs</Typography>
-          <Typography gutterBottom>{principles}</Typography>
+          <TableContainer component={Paper} sx={{ mb: 2 }}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell width={1}>ID</TableCell>
+                  <TableCell>CCP</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {principles &&
+                  principles.map(({ id, value }) => (
+                    <TableRow
+                      key={id.toString()}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell>{id.toString()}</TableCell>
+                      <TableCell>{value}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
           <Typography variant="h5">CCPs History</Typography>
           <ConstitutionTimeline
             items={principlesHistory}
-            keyExtractor={(item) => item.proposal.proposalId}
+            keyExtractor={(item) => item.proposal?.proposalId || item.value}
             leftText={(item) => item.time.toLocaleString()}
-            rightHeading={(item) => item.proposal.description}
+            rightHeading={(item) =>
+              item.proposal?.description || "Council Creation"
+            }
+            dotColor={(item) => {
+              switch (item.operation) {
+                case "add":
+                  return "success";
+                case "update":
+                  return "info";
+                case "remove":
+                  return "error";
+                default:
+                  return "warning";
+              }
+            }}
             rightText={(item) => item.value}
           />
         </AccordionDetails>
@@ -115,14 +157,49 @@ function ConstitutionInfo({}: Props) {
 
         <AccordionDetails>
           <Typography variant="h5">Current Strategies</Typography>
-          <Typography gutterBottom>{strategies}</Typography>
+          <TableContainer component={Paper} sx={{ mb: 2 }}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell width={1}>ID</TableCell>
+                  <TableCell>CCP</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {strategies &&
+                  strategies.map(({ id, value }) => (
+                    <TableRow
+                      key={id.toString()}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell>{id.toString()}</TableCell>
+                      <TableCell>{value}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
           <Typography variant="h5">Strategies History</Typography>
           <ConstitutionTimeline
             items={strategiesHistory}
-            keyExtractor={(item) => item.proposal.proposalId}
+            keyExtractor={(item) => item.proposal?.proposalId || item.value}
             leftText={(item) => item.time.toLocaleString()}
-            rightHeading={(item) => item.proposal.description}
+            rightHeading={(item) =>
+              item.proposal?.description || "Council Creation"
+            }
+            dotColor={(item) => {
+              switch (item.operation) {
+                case "add":
+                  return "success";
+                case "update":
+                  return "info";
+                case "remove":
+                  return "error";
+                default:
+                  return "warning";
+              }
+            }}
             rightText={(item) => item.value}
           />
         </AccordionDetails>

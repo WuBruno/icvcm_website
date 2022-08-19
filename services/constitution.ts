@@ -1,12 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { Proposal } from "~/@types";
 import { Contracts, Member, Roles } from "~/@types/Roles";
-import {
-  ICVCMGovernor,
-  ICVCMGovernor__factory,
-  ICVCMRoles,
-  ICVCMToken,
-} from "~/contracts/types";
+import { ICVCMGovernor, ICVCMRoles, ICVCMToken } from "~/contracts/types";
 import { TypedEvent } from "~/contracts/types/common";
 import { ICVCMConstitution } from "~/contracts/types/ICVCMConstitution";
 import { parseProposalAuthorization } from "./members";
@@ -16,13 +11,16 @@ export type ConstitutionChange = {
   time: Date;
   proposal?: Proposal;
   type: string;
+  operation: string;
   value: string;
 };
 export type PrincipleChanges = ConstitutionChange & {
   type: "principle";
+  operation: "add" | "update" | "remove";
 };
 export type StrategyChanges = ConstitutionChange & {
   type: "strategy";
+  operation: "add" | "update" | "remove";
 };
 export type MemberChanges = ConstitutionChange & {
   type: "member";
@@ -50,22 +48,63 @@ export const getPrinciplesHistory = async (
   roles: ICVCMRoles,
   constitution: ICVCMConstitution
 ): Promise<PrincipleChanges[]> => {
-  const filters = constitution.filters.UpdatePrinciples();
-  const events = await constitution.queryFilter(filters);
-  events.reverse();
-  const governorInterface = ICVCMGovernor__factory.createInterface();
+  const addPrincipleFilters = constitution.filters.AddPrinciple();
+  const addPrincipleEvent = await constitution.queryFilter(addPrincipleFilters);
 
-  return Promise.all(
-    events.map(async (event) => {
+  const updatePrincipleFilters = constitution.filters.UpdatePrinciple();
+  const updatePrincipleEvent = await constitution.queryFilter(
+    updatePrincipleFilters
+  );
+
+  const removePrincipleFilters = constitution.filters.RemovePrinciple();
+  const removePrincipleEvents = await constitution.queryFilter(
+    removePrincipleFilters
+  );
+
+  const addPrinciple = await Promise.all(
+    addPrincipleEvent.map(async (event): Promise<PrincipleChanges> => {
       const { time, proposal } = await getEventProposal(governor, roles, event);
 
       return {
-        value: event.args.newPrinciples,
+        value: `Add Principle: ${event.args.id}. ${event.args.principle}`,
         time,
         proposal,
         type: "principle",
+        operation: "add",
       };
     })
+  );
+
+  const updatePrinciple = await Promise.all(
+    updatePrincipleEvent.map(async (event): Promise<PrincipleChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+
+      return {
+        value: `Update Principle: ${event.args.id}. ${event.args.newPrinciple}`,
+        time,
+        proposal,
+        type: "principle",
+        operation: "update",
+      };
+    })
+  );
+
+  const removePrinciple = await Promise.all(
+    removePrincipleEvents.map(async (event): Promise<PrincipleChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+
+      return {
+        value: `Remove Principle: ${event.args.id}. ${event.args.principle}`,
+        time,
+        proposal,
+        type: "principle",
+        operation: "remove",
+      };
+    })
+  );
+
+  return [...addPrinciple, ...updatePrinciple, ...removePrinciple].sort(
+    (a, b) => b.time.getTime() - a.time.getTime()
   );
 };
 
@@ -74,21 +113,63 @@ export const getStrategiesHistory = async (
   roles: ICVCMRoles,
   constitution: ICVCMConstitution
 ): Promise<StrategyChanges[]> => {
-  const filters = constitution.filters.UpdateStrategies();
-  const events = await constitution.queryFilter(filters);
-  events.reverse();
-  const governorInterface = ICVCMGovernor__factory.createInterface();
+  const addStrategyFilters = constitution.filters.AddStrategy();
+  const addStrategyEvents = await constitution.queryFilter(addStrategyFilters);
 
-  return Promise.all(
-    events.map(async (event) => {
+  const updateStrategyFilters = constitution.filters.UpdateStrategy();
+  const updateStrategyEvent = await constitution.queryFilter(
+    updateStrategyFilters
+  );
+
+  const removePrincipleFilters = constitution.filters.RemoveStrategy();
+  const removePrincipleEvents = await constitution.queryFilter(
+    removePrincipleFilters
+  );
+
+  const addStrategy = await Promise.all(
+    addStrategyEvents.map(async (event): Promise<StrategyChanges> => {
       const { time, proposal } = await getEventProposal(governor, roles, event);
+
       return {
-        value: event.args.newStrategies,
+        value: `Add Strategy: ${event.args.id}. ${event.args.strategy}`,
         time,
         proposal,
         type: "strategy",
+        operation: "add",
       };
     })
+  );
+
+  const updateStrategy = await Promise.all(
+    updateStrategyEvent.map(async (event): Promise<StrategyChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+
+      return {
+        value: `Update Strategy: ${event.args.id}. ${event.args.newStrategy}`,
+        time,
+        proposal,
+        type: "strategy",
+        operation: "update",
+      };
+    })
+  );
+
+  const removeStrategy = await Promise.all(
+    removePrincipleEvents.map(async (event): Promise<StrategyChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+
+      return {
+        value: `Remove Proposal: ${event.args.id}. ${event.args.strategy}`,
+        time,
+        proposal,
+        type: "strategy",
+        operation: "remove",
+      };
+    })
+  );
+
+  return [...addStrategy, ...updateStrategy, ...removeStrategy].sort(
+    (a, b) => b.time.getTime() - a.time.getTime()
   );
 };
 
