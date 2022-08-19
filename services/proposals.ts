@@ -11,6 +11,7 @@ import {
   ICVCMRoles,
   ICVCMRoles__factory,
   ICVCMToken,
+  ICVCMToken__factory,
 } from "~/contracts/types";
 import { ProposalCreatedEvent } from "~/contracts/types/Governor";
 import { parseBlockToDays } from "~/util";
@@ -196,6 +197,57 @@ export const proposeRemoveProposalAuthorization = async (
   );
 };
 
+export const proposeUpgradeContract = async (
+  ICVCMGovernor: ICVCMGovernor,
+  description: string,
+  contract: Contracts,
+  newImplementationAddress: string
+) => {
+  let encodedFunctionCall: string;
+  let contractAddress: string;
+  switch (contract) {
+    case Contracts.ICVCMGovernor:
+      encodedFunctionCall =
+        ICVCMGovernor__factory.createInterface().encodeFunctionData(
+          "upgradeTo",
+          [newImplementationAddress]
+        );
+      contractAddress = ContractAddresses.ICVCMGovernor;
+      break;
+    case Contracts.ICVCMConstitution:
+      encodedFunctionCall =
+        ICVCMConstitution__factory.createInterface().encodeFunctionData(
+          "upgradeTo",
+          [newImplementationAddress]
+        );
+      contractAddress = ContractAddresses.ICVCMConstitution;
+      break;
+    case Contracts.ICVCMRoles:
+      encodedFunctionCall =
+        ICVCMRoles__factory.createInterface().encodeFunctionData("upgradeTo", [
+          newImplementationAddress,
+        ]);
+      contractAddress = ContractAddresses.ICVCMRoles;
+      break;
+    case Contracts.ICVCMToken:
+      encodedFunctionCall =
+        ICVCMToken__factory.createInterface().encodeFunctionData("upgradeTo", [
+          newImplementationAddress,
+        ]);
+      contractAddress = ContractAddresses.ICVCMToken;
+      break;
+    default:
+      break;
+  }
+
+  return propose(
+    ICVCMGovernor,
+    contractAddress,
+    encodedFunctionCall,
+    description
+  );
+};
+
 const prepareProposalAuthorization = (
   proposalAuthorization: ProposalAuthorization
 ) => {
@@ -299,6 +351,18 @@ const parseProposalEvent = async (
           payload: parseProposalAuthorization(address, selector, role),
         };
         break;
+      case ICVCMRolesInterface.functions["upgradeTo(address)"]:
+        var [implAddress] = ICVCMRolesInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "upgradeTo",
+          payload: {
+            contract: Contracts.ICVCMRoles,
+            implAddress,
+          },
+        };
     }
   } else if (contractAddress === ContractAddresses.ICVCMConstitution) {
     // They are constitution changes
@@ -327,6 +391,18 @@ const parseProposalEvent = async (
           payload: { strategies },
         };
         break;
+      case ICVCMConstitutionInterface.functions["upgradeTo(address)"]:
+        var [implAddress] = ICVCMConstitutionInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "upgradeTo",
+          payload: {
+            contract: Contracts.ICVCMConstitution,
+            implAddress,
+          },
+        };
     }
   } else if (contractAddress === ContractAddresses.ICVCMGovernor) {
     const ICVCMGovernorInterface = ICVCMGovernor__factory.createInterface();
@@ -356,6 +432,36 @@ const parseProposalEvent = async (
           },
         };
         break;
+      case ICVCMGovernorInterface.functions["upgradeTo(address)"]:
+        var [implAddress] = ICVCMGovernorInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "upgradeTo",
+          payload: {
+            contract: Contracts.ICVCMGovernor,
+            implAddress,
+          },
+        };
+    }
+  } else if (contractAddress === ContractAddresses.ICVCMToken) {
+    const ICVCMTokenInterface = ICVCMToken__factory.createInterface();
+    const fragment = ICVCMTokenInterface.getFunction(methodId);
+
+    switch (fragment) {
+      case ICVCMTokenInterface.functions["upgradeTo(address)"]:
+        var [implAddress] = ICVCMTokenInterface.decodeFunctionData(
+          fragment,
+          calldata
+        );
+        proposalAction = {
+          action: "upgradeTo",
+          payload: {
+            contract: Contracts.ICVCMGovernor,
+            implAddress,
+          },
+        };
     }
   }
 
@@ -483,6 +589,7 @@ export const executeProposal = async (
   await mutate("getVotingPeriod");
   await mutate("getSettingsHistory");
   await mutate("getProposalAuthorizations");
+  await mutate("getContractVersions");
 };
 
 export const cancelProposal = async (

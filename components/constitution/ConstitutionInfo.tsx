@@ -8,10 +8,12 @@ import {
 } from "@mui/material";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
+import { MembersList } from "~/components/members";
 import {
   useICVCMConstitution,
   useICVCMGovernor,
   useICVCMRoles,
+  useICVCMToken,
 } from "~/hooks/contracts";
 import {
   getMemberHistory,
@@ -23,8 +25,8 @@ import {
 } from "~/services/constitution";
 import { getQuorum, getVotingPeriod } from "~/services/proposals";
 import { parseBlockToDays, parseDaysToBlocks } from "~/util";
-import { MembersList } from "../members";
 import ConstitutionTimeline from "./ConstitutionTimeline";
+import ContractInfo from "./ContractInfo";
 import ProposalAuthorizationList from "./ProposalAuthorizationList";
 
 type Props = {};
@@ -33,6 +35,7 @@ function ConstitutionInfo({}: Props) {
   const ICVCMConstitution = useICVCMConstitution();
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();
+  const ICVCMToken = useICVCMToken();
 
   const { data: principles } = useSWR(
     ICVCMConstitution ? "principles" : null,
@@ -68,9 +71,17 @@ function ConstitutionInfo({}: Props) {
     ICVCMGovernor ? "getVotingPeriod" : null,
     async () => getVotingPeriod(ICVCMGovernor)
   );
-  const { data: settingsHistory, error } = useSWR(
-    ICVCMGovernor && ICVCMRoles ? "getSettingsHistory" : null,
-    async () => getSettingsHistory(ICVCMGovernor, ICVCMRoles)
+  const { data: settingsHistory } = useSWR(
+    ICVCMGovernor && ICVCMRoles && ICVCMConstitution && ICVCMToken
+      ? "getSettingsHistory"
+      : null,
+    async () =>
+      getSettingsHistory(
+        ICVCMGovernor,
+        ICVCMRoles,
+        ICVCMConstitution,
+        ICVCMToken
+      )
   );
 
   return (
@@ -83,10 +94,10 @@ function ConstitutionInfo({}: Props) {
         </AccordionSummary>
 
         <AccordionDetails>
-          <Typography variant="h6">Current CCPs</Typography>
+          <Typography variant="h5">Current CCPs</Typography>
           <Typography gutterBottom>{principles}</Typography>
 
-          <Typography variant="h6">CCPs History</Typography>
+          <Typography variant="h5">CCPs History</Typography>
           <ConstitutionTimeline
             items={principlesHistory}
             keyExtractor={(item) => item.proposal.proposalId}
@@ -103,10 +114,10 @@ function ConstitutionInfo({}: Props) {
         </AccordionSummary>
 
         <AccordionDetails>
-          <Typography variant="h6">Current Strategies</Typography>
+          <Typography variant="h5">Current Strategies</Typography>
           <Typography gutterBottom>{strategies}</Typography>
 
-          <Typography variant="h6">Strategies History</Typography>
+          <Typography variant="h5">Strategies History</Typography>
           <ConstitutionTimeline
             items={strategiesHistory}
             keyExtractor={(item) => item.proposal.proposalId}
@@ -123,10 +134,10 @@ function ConstitutionInfo({}: Props) {
         </AccordionSummary>
 
         <AccordionDetails>
-          <Typography variant="h6">Current Members</Typography>
+          <Typography variant="h5">Current Members</Typography>
           <MembersList />
 
-          <Typography variant="h6">Membership Changes</Typography>
+          <Typography variant="h5">Membership Changes</Typography>
           <ConstitutionTimeline
             items={memberHistory}
             keyExtractor={(item) =>
@@ -154,16 +165,20 @@ function ConstitutionInfo({}: Props) {
         </AccordionSummary>
 
         <AccordionDetails>
-          <Typography variant="h6">Current Governance Settings</Typography>
+          <Typography variant="h5">Current Governance Settings</Typography>
           <Typography gutterBottom>
             Voting Quorum: {quorum && quorum.toNumber()}%
           </Typography>
           <Typography gutterBottom>
             Voting Period: {period} days ≈ {parseDaysToBlocks(period)} Blocks{" "}
           </Typography>
+          <Typography variant="h6">Proposal Authorizations:</Typography>
           <ProposalAuthorizationList />
+          <ContractInfo />
 
-          <Typography variant="h6">Setting Changes</Typography>
+          <Typography variant="h5" sx={{ mt: 2 }}>
+            Setting Changes
+          </Typography>
           <ConstitutionTimeline
             items={settingsHistory}
             keyExtractor={(item) =>
@@ -177,6 +192,8 @@ function ConstitutionInfo({}: Props) {
               switch (item.operation) {
                 case "addProposalAuthorization":
                   return "success";
+                case "upgrade":
+                  return "info";
                 case "removeProposalAuthorization":
                   return "error";
                 default:

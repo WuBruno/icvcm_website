@@ -1,12 +1,13 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { Proposal } from "~/@types";
-import { Member, Roles } from "~/@types/Roles";
+import { Contracts, Member, Roles } from "~/@types/Roles";
 import {
   ICVCMGovernor,
   ICVCMGovernor__factory,
   ICVCMRoles,
-  ICVCMRoles__factory,
+  ICVCMToken,
 } from "~/contracts/types";
+import { TypedEvent } from "~/contracts/types/common";
 import { ICVCMConstitution } from "~/contracts/types/ICVCMConstitution";
 import { parseFunctionName, parseProposalAuthorization } from "./members";
 import { getProposal } from "./proposals";
@@ -34,7 +35,8 @@ export type SettingChanges = ConstitutionChange & {
     | "quorum"
     | "period"
     | "addProposalAuthorization"
-    | "removeProposalAuthorization";
+    | "removeProposalAuthorization"
+    | "upgrade";
 };
 
 export const getPrinciples = async (constitution: ICVCMConstitution) =>
@@ -55,14 +57,11 @@ export const getPrinciplesHistory = async (
 
   return Promise.all(
     events.map(async (event) => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-      const proposal = await getProposal(governor, roles, proposalId);
+      const { time, proposal } = await getEventProposal(governor, roles, event);
 
       return {
         value: event.args.newPrinciples,
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "principle",
       };
@@ -82,14 +81,10 @@ export const getStrategiesHistory = async (
 
   return Promise.all(
     events.map(async (event) => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-      const proposal = await getProposal(governor, roles, proposalId);
-
+      const { time, proposal } = await getEventProposal(governor, roles, event);
       return {
         value: event.args.newStrategies,
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "strategy",
       };
@@ -106,22 +101,14 @@ export const getMemberHistory = async (
 
   const addEvents = await roles.queryFilter(addFilter);
   const removeEvents = await roles.queryFilter(removeFilter);
-  const governorInterface = ICVCMGovernor__factory.createInterface();
 
   const add = await Promise.all(
     addEvents.map(async (event): Promise<MemberChanges> => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      let proposal;
-
-      if (txn.logs[0].address == governor.address) {
-        const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-        proposal = await getProposal(governor, roles, proposalId);
-      }
+      const { time, proposal } = await getEventProposal(governor, roles, event);
 
       return {
         value: "",
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "member",
         operation: "add",
@@ -136,18 +123,11 @@ export const getMemberHistory = async (
 
   const remove = await Promise.all(
     removeEvents.map(async (event): Promise<MemberChanges> => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      let proposal;
-
-      if (txn.logs[0].address == governor.address) {
-        const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-        proposal = await getProposal(governor, roles, proposalId);
-      }
+      const { time, proposal } = await getEventProposal(governor, roles, event);
 
       return {
         value: "",
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "member",
         operation: "remove",
@@ -167,7 +147,9 @@ export const getMemberHistory = async (
 
 export const getSettingsHistory = async (
   governor: ICVCMGovernor,
-  roles: ICVCMRoles
+  roles: ICVCMRoles,
+  constitution: ICVCMConstitution,
+  token: ICVCMToken
 ): Promise<SettingChanges[]> => {
   const quorumFilter = governor.filters.QuorumNumeratorUpdated();
   const quorumEvents = await governor.queryFilter(quorumFilter);
@@ -181,23 +163,27 @@ export const getSettingsHistory = async (
   const removeAuthFilter = roles.filters.ProposalAuthorizationRemoved();
   const removeAuthEvents = await roles.queryFilter(removeAuthFilter);
 
+  const upgradeGovernorFilter = governor.filters.ContractUpgraded();
+  const upgradeGovernorEvents = await governor.queryFilter(
+    upgradeGovernorFilter
+  );
+  const upgradeRolesFilter = roles.filters.ContractUpgraded();
+  const upgradeRolesEvents = await roles.queryFilter(upgradeRolesFilter);
+  const upgradeTokenFilter = token.filters.ContractUpgraded();
+  const upgradeTokenEvents = await token.queryFilter(upgradeTokenFilter);
+  const upgradeConstitutionFilter = constitution.filters.ContractUpgraded();
+  const upgradeConstitutionEvents = await constitution.queryFilter(
+    upgradeConstitutionFilter
+  );
+
   const governorInterface = ICVCMGovernor__factory.createInterface();
-  const rolesInterface = ICVCMRoles__factory.createInterface();
 
   const quorum = await Promise.all(
     quorumEvents.map(async (event): Promise<SettingChanges> => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      let proposal;
-
-      if (txn.logs[0].address == governor.address) {
-        const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-        proposal = await getProposal(governor, roles, proposalId);
-      }
-
+      const { time, proposal } = await getEventProposal(governor, roles, event);
       return {
         value: `${event.args.newQuorumNumerator.toString()}`,
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "settings",
         operation: "quorum",
@@ -207,18 +193,11 @@ export const getSettingsHistory = async (
 
   const period = await Promise.all(
     periodEvents.map(async (event): Promise<SettingChanges> => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      let proposal;
-
-      if (txn.logs[0].address == governor.address) {
-        const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-        proposal = await getProposal(governor, roles, proposalId);
-      }
+      const { time, proposal } = await getEventProposal(governor, roles, event);
 
       return {
         value: `${event.args.newVotingPeriod.toString()}`,
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "settings",
         operation: "period",
@@ -228,14 +207,7 @@ export const getSettingsHistory = async (
 
   const addAuth = await Promise.all(
     addAuthEvents.map(async (event): Promise<SettingChanges> => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      let proposal;
-
-      if (txn.logs[0].address == governor.address) {
-        const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-        proposal = await getProposal(governor, roles, proposalId);
-      }
+      const { time, proposal } = await getEventProposal(governor, roles, event);
       const { function: functionName, role } = parseProposalAuthorization(
         event.args.contractAddress,
         event.args.selector,
@@ -246,7 +218,7 @@ export const getSettingsHistory = async (
         value: `Add Proposal Authorization of ${
           Roles[role]
         } to ${parseFunctionName(functionName)}`,
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "settings",
         operation: "addProposalAuthorization",
@@ -256,14 +228,7 @@ export const getSettingsHistory = async (
 
   const removeAuth = await Promise.all(
     removeAuthEvents.map(async (event): Promise<SettingChanges> => {
-      const block = await event.getBlock();
-      const txn = await event.getTransactionReceipt();
-      let proposal;
-
-      if (txn.logs[0].address == governor.address) {
-        const proposalId = governorInterface.parseLog(txn.logs[0]).args[0];
-        proposal = await getProposal(governor, roles, proposalId);
-      }
+      const { time, proposal } = await getEventProposal(governor, roles, event);
       const { function: functionName, role } = parseProposalAuthorization(
         event.args.contractAddress,
         event.args.selector,
@@ -274,7 +239,7 @@ export const getSettingsHistory = async (
         value: `Remove Proposal Authorization of ${
           Roles[role]
         } to ${parseFunctionName(functionName)}`,
-        time: new Date(block.timestamp * 1e3),
+        time,
         proposal,
         type: "settings",
         operation: "removeProposalAuthorization",
@@ -282,7 +247,99 @@ export const getSettingsHistory = async (
     })
   );
 
-  return [...quorum, ...period, ...addAuth, ...removeAuth].sort(
-    (a, b) => b.time.getTime() - a.time.getTime()
+  const upgradeGovernor = await Promise.all(
+    upgradeGovernorEvents.map(async (event): Promise<SettingChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+      return {
+        value: `ICVCMGovernor deployed version: ${event.args.version}`,
+        time,
+        proposal,
+        type: "settings",
+        operation: "upgrade",
+      };
+    })
+  );
+  const upgradeRole = await Promise.all(
+    upgradeRolesEvents.map(async (event): Promise<SettingChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+      return {
+        value: `ICVCMRoles deployed version: ${event.args.version}`,
+        time,
+        proposal,
+        type: "settings",
+        operation: "upgrade",
+      };
+    })
+  );
+  const upgradeToken = await Promise.all(
+    upgradeTokenEvents.map(async (event): Promise<SettingChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+      return {
+        value: `ICVCMToken deployed version: ${event.args.version}`,
+        time,
+        proposal,
+        type: "settings",
+        operation: "upgrade",
+      };
+    })
+  );
+  const upgradeConstitution = await Promise.all(
+    upgradeConstitutionEvents.map(async (event): Promise<SettingChanges> => {
+      const { time, proposal } = await getEventProposal(governor, roles, event);
+      return {
+        value: `ICVCMConstitution deployed version: ${event.args.version}`,
+        time,
+        proposal,
+        type: "settings",
+        operation: "upgrade",
+      };
+    })
+  );
+
+  return [
+    ...quorum,
+    ...period,
+    ...addAuth,
+    ...removeAuth,
+    ...upgradeGovernor,
+    ...upgradeRole,
+    ...upgradeToken,
+    ...upgradeConstitution,
+  ].sort((a, b) => b.time.getTime() - a.time.getTime());
+};
+
+export const getEventProposal = async <TEvent extends TypedEvent>(
+  governor: ICVCMGovernor,
+  roles: ICVCMRoles,
+  event: TEvent
+) => {
+  const block = await event.getBlock();
+  const txn = await event.getTransactionReceipt();
+  let proposal;
+
+  if (txn.logs[0].address == governor.address) {
+    const proposalId = governor.interface.parseLog(txn.logs[0]).args[0];
+    proposal = await getProposal(governor, roles, proposalId);
+  }
+
+  return {
+    time: new Date(block.timestamp * 1e3),
+    proposal,
+  };
+};
+
+export const getContractVersions = (
+  ICVCMGovernor: ICVCMGovernor,
+  ICVCMRoles: ICVCMRoles,
+  ICVCMToken: ICVCMToken,
+  ICVCMConstitution: ICVCMConstitution
+): Promise<[BigNumber, Contracts][]> => {
+  return Promise.all(
+    [
+      [ICVCMGovernor, Contracts.ICVCMGovernor] as const,
+      [ICVCMRoles, Contracts.ICVCMRoles] as const,
+      [ICVCMToken, Contracts.ICVCMToken] as const,
+      [ICVCMConstitution, Contracts.ICVCMConstitution] as const,
+    ].map(async ([contract, c]) => [await contract.getVersion(), c])
   );
 };

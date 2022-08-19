@@ -1,4 +1,4 @@
-import { Member, ProposalAuthorization } from "./Roles";
+import { Contracts, Member, ProposalAuthorization } from "./Roles";
 
 export type Proposal = {
   proposalId: string;
@@ -80,6 +80,14 @@ type RemoveProposalAuthorization = Action & {
   payload: ProposalAuthorization;
 };
 
+type UpgradeContract = Action & {
+  action: "upgradeTo";
+  payload: {
+    contract: Contracts;
+    implAddress: string;
+  };
+};
+
 export type ProposalAction =
   | AddMemberAction
   | RemoveMemberAction
@@ -88,4 +96,5 @@ export type ProposalAction =
   | SetVotingQuorum
   | SetVotingPeriod
   | AddProposalAuthorization
-  | RemoveProposalAuthorization;
+  | RemoveProposalAuthorization
+  | UpgradeContract;

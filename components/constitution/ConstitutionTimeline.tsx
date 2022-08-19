@@ -15,7 +15,7 @@ type Props<T> = {
   leftText: (item: T) => string;
   rightHeading: (item: T) => string;
   rightText: (item: T) => string;
-  dotColor?: (item: T) => "success" | "error" | "grey" | "warning";
+  dotColor?: (item: T) => "success" | "error" | "grey" | "warning" | "info";
 };
 
 const ConstitutionTimeline = <T extends object>({

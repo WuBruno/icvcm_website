@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { Proposal } from "~/@types";
-import { Roles } from "~/@types/Roles";
+import { Contracts, Roles } from "~/@types/Roles";
 import { parseFunctionName } from "~/services/members";
 import { parseBlockToDays } from "~/util";
 import ProposalHistory from "./ProposalHistory";
@@ -127,6 +127,21 @@ const ProposalInfo = ({ proposal }: Props) => {
             </Typography>
             <Typography variant="body2">
               Role: <b>{Roles[proposalAction.payload.role]}</b>
+            </Typography>
+          </Stack>
+        );
+      case "upgradeTo":
+        return (
+          <Stack>
+            <Typography gutterBottom>
+              Action: <b>Upgrade Contract</b>
+            </Typography>
+            <Typography>Upgrade details:</Typography>
+            <Typography variant="body2">
+              Contract: {Contracts[proposalAction.payload.contract]}
+            </Typography>
+            <Typography variant="body2">
+              Address: <b>{proposalAction.payload.contract}</b>
             </Typography>
           </Stack>
         );

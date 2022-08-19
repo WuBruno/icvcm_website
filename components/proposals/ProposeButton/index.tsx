@@ -17,7 +17,8 @@ import AddProposalAuthorization from "./AddProposalAuthorization";
 import EditPrinciple from "./EditPrinciple";
 import EditStrategy from "./EditStrategy";
 import RemoveMember from "./RemoveMember";
-import { default as RemoveProposalAuthorization } from "./RemoveProposalAuthorization";
+import RemoveProposalAuthorization from "./RemoveProposalAuthorization";
+import UpgradeContract from "./UpgradeContract";
 import VotingPeriod from "./VotingPeriod";
 import VotingQuorum from "./VotingQuorum";
 
@@ -42,6 +43,7 @@ enum ProposalType {
   VotingPeriod,
   AddProposalAuthorization,
   RemoveProposalAuthorization,
+  UpgradeContract,
 }
 
 const ProposeButton = () => {
@@ -61,7 +63,6 @@ const ProposeButton = () => {
     }
     return;
   }, [user, data]);
-  console.log(authorizations);
 
   const handleChangeProposalType = (
     event: React.MouseEvent<HTMLElement>,
@@ -88,6 +89,8 @@ const ProposeButton = () => {
         return <AddProposalAuthorization setOpen={setOpen} />;
       case ProposalType.RemoveProposalAuthorization:
         return <RemoveProposalAuthorization setOpen={setOpen} />;
+      case ProposalType.UpgradeContract:
+        return <UpgradeContract setOpen={setOpen} />;
 
       default:
         return null;
@@ -165,6 +168,12 @@ const ProposeButton = () => {
               }
             >
               Remove Proposal Authorization
+            </ToggleButton>
+            <ToggleButton
+              value={ProposalType.UpgradeContract}
+              disabled={!authorizations?.includes("upgradeTo")}
+            >
+              Upgrade Contract
             </ToggleButton>
           </ToggleButtonGroup>
 

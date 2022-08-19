@@ -80,6 +80,7 @@ export const functionNames = {
   setVotingPeriod: "Set Voting Period",
   addProposalAuthorization: "Add Proposal Authorization",
   removeProposalAuthorization: "Remove Proposal Authorization",
+  upgradeTo: "Upgrade Contract",
 };
 
 export const FunctionContracts = {
@@ -91,6 +92,7 @@ export const FunctionContracts = {
   setVotingPeriod: Contracts.ICVCMGovernor,
   addProposalAuthorization: Contracts.ICVCMRoles,
   removeProposalAuthorization: Contracts.ICVCMRoles,
+  upgradeTo: Contracts.ICVCMGovernor,
 };
 
 export const parseFunctionName = (name: string): string => {

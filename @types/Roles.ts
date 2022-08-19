@@ -15,6 +15,7 @@ export enum Contracts {
   ICVCMRoles,
   ICVCMGovernor,
   ICVCMConstitution,
+  ICVCMToken,
 }
 
 export type ProposalAuthorization = {
