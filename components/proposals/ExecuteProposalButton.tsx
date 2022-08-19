@@ -3,7 +3,7 @@ import { Proposal, ProposalState } from "~/@types";
 import { Roles } from "~/@types/Roles";
 import { useAsync, useUser } from "~/hooks/common";
 import { useICVCMGovernor } from "~/hooks/contracts";
-import { executeProposal } from "~/services/proposals";
+import { cancelProposal, executeProposal } from "~/services/proposals";
 
 type Props = {
   proposal: Proposal;
@@ -16,20 +16,33 @@ function ExecuteProposalButton({ proposal }: Props) {
   const [_, execute] = useAsync(async () =>
     executeProposal(ICVCMGovernor, proposal)
   );
+  const [, executeCancel] = useAsync(async () =>
+    cancelProposal(ICVCMGovernor, proposal)
+  );
 
   const isRegulator = user && user.role === Roles.Regulator;
 
   switch (proposal.state) {
     case ProposalState.Succeeded:
       return (
-        <Button
-          disabled={!isRegulator}
-          variant="contained"
-          color="success"
-          onClick={() => execute()}
-        >
-          Execute
-        </Button>
+        <div>
+          <Button
+            disabled={!isRegulator}
+            variant="contained"
+            color="success"
+            onClick={() => execute()}
+          >
+            Execute
+          </Button>
+          <Button
+            disabled={!isRegulator}
+            variant="contained"
+            color="success"
+            onClick={() => executeCancel()}
+          >
+            Cancel
+          </Button>
+        </div>
       );
     case ProposalState.Defeated:
       return (
@@ -46,7 +59,7 @@ function ExecuteProposalButton({ proposal }: Props) {
     case ProposalState.Cancelled:
       return (
         <Button variant="contained" disabled>
-          Canceled
+          Cancelled
         </Button>
       );
 
