@@ -71,7 +71,7 @@ function ConstitutionInfo({}: Props) {
     ICVCMGovernor ? "getVotingPeriod" : null,
     async () => getVotingPeriod(ICVCMGovernor)
   );
-  const { data: settingsHistory } = useSWR(
+  const { data: settingsHistory, error } = useSWR(
     ICVCMGovernor && ICVCMRoles && ICVCMConstitution && ICVCMToken
       ? "getSettingsHistory"
       : null,

@@ -206,7 +206,11 @@ export const getSettingsHistory = async (
   const addAuth = await Promise.all(
     addAuthEvents.map(async (event): Promise<SettingChanges> => {
       const { time, proposal } = await getEventProposal(governor, roles, event);
-      const { function: functionName, role } = parseProposalAuthorization(
+      const {
+        function: functionName,
+        role,
+        contract,
+      } = parseProposalAuthorization(
         event.args.contractAddress,
         event.args.selector,
         event.args.role
@@ -215,7 +219,7 @@ export const getSettingsHistory = async (
       return {
         value: `Add Proposal Authorization of ${
           Roles[role]
-        } to ${parseFunctionName(functionName)}`,
+        } to ${parseFunctionName(functionName)} in ${Contracts[contract]}`,
         time,
         proposal,
         type: "settings",

@@ -47,12 +47,7 @@ const ConstitutionTimeline = <T extends object>({
               </TimelineSeparator>
               <TimelineContent sx={{ py: "12px", px: 2 }}>
                 <Typography>Proposal: {rightHeading(item)}</Typography>
-                <Typography
-                  sx={{ textTransform: "capitalize" }}
-                  variant="caption"
-                >
-                  {rightText(item)}
-                </Typography>
+                <Typography variant="caption">{rightText(item)}</Typography>
               </TimelineContent>
             </TimelineItem>
           );

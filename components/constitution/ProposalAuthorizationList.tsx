@@ -10,7 +10,7 @@ import {
 import _ from "lodash";
 import { useMemo } from "react";
 import useSWR from "swr";
-import { Roles } from "~/@types/Roles";
+import { Contracts, Roles } from "~/@types/Roles";
 import { useICVCMRoles } from "~/hooks/contracts";
 import { getProposalAuthorizations } from "~/services/members";
 import { parseFunctionName } from "~/services/proposals";
@@ -52,7 +52,11 @@ const ProposalAuthorizationList = (props: Props) => {
                 }
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell>{parseFunctionName(row[0].function)}</TableCell>
+                <TableCell>
+                  {row[0].function === "upgradeTo"
+                    ? `Upgrade ${Contracts[row[0].contract]}`
+                    : parseFunctionName(row[0].function)}
+                </TableCell>
                 <TableCell align="right">
                   {row.map((x) => Roles[x.role]).join(", ")}
                 </TableCell>

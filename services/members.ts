@@ -11,6 +11,7 @@ import {
   ICVCMGovernor__factory,
   ICVCMRoles,
   ICVCMRoles__factory,
+  ICVCMToken__factory,
 } from "~/contracts/types";
 
 export const getMember = async (
@@ -67,6 +68,13 @@ export const parseProposalAuthorization = (
         function:
           ICVCMConstitution__factory.createInterface().getFunction(selector)
             .name,
+      };
+    case ContractAddress.ICVCMToken:
+      return {
+        contract: Contracts.ICVCMToken,
+        role,
+        function:
+          ICVCMToken__factory.createInterface().getFunction(selector).name,
       };
   }
 };

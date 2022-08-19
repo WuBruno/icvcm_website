@@ -629,8 +629,12 @@ export const getVotingPeriod = async (ICVCMGovernor: ICVCMGovernor) => {
 export const functionNames = {
   addMember: "Add Member",
   removeMember: "Remove Member",
-  setPrinciples: "Edit Principles",
-  setStrategies: "Edit Strategies",
+  addPrinciple: "Add Principle",
+  updatePrinciple: "Update Principle",
+  removePrinciple: "Remove Principle",
+  addStrategy: "Add Strategy",
+  updateStrategy: "Update Strategy",
+  removeStrategy: "Remove Strategy",
   updateQuorumNumerator: "Set Voting Quorum",
   setVotingPeriod: "Set Voting Period",
   addProposalAuthorization: "Add Proposal Authorization",
@@ -638,17 +642,24 @@ export const functionNames = {
   upgradeTo: "Upgrade Contract",
 };
 
-export const FunctionContracts = {
-  addMember: Contracts.ICVCMRoles,
-  removeMember: Contracts.ICVCMRoles,
-  setPrinciples: Contracts.ICVCMConstitution,
-  setStrategies: Contracts.ICVCMConstitution,
-  updateQuorumNumerator: Contracts.ICVCMGovernor,
-  setVotingPeriod: Contracts.ICVCMGovernor,
-  addProposalAuthorization: Contracts.ICVCMRoles,
-  removeProposalAuthorization: Contracts.ICVCMRoles,
-  upgradeTo: Contracts.ICVCMGovernor,
-};
+export const FunctionContracts = [
+  ["addMember", Contracts.ICVCMRoles],
+  ["removeMember", Contracts.ICVCMRoles],
+  ["addPrinciple", Contracts.ICVCMConstitution],
+  ["updatePrinciple", Contracts.ICVCMConstitution],
+  ["removePrinciple", Contracts.ICVCMConstitution],
+  ["addStrategy", Contracts.ICVCMConstitution],
+  ["updateStrategy", Contracts.ICVCMConstitution],
+  ["removeStrategy", Contracts.ICVCMConstitution],
+  ["updateQuorumNumerator", Contracts.ICVCMGovernor],
+  ["setVotingPeriod", Contracts.ICVCMGovernor],
+  ["addProposalAuthorization", Contracts.ICVCMRoles],
+  ["removeProposalAuthorization", Contracts.ICVCMRoles],
+  ["upgradeTo", Contracts.ICVCMGovernor],
+  ["upgradeTo", Contracts.ICVCMRoles],
+  ["upgradeTo", Contracts.ICVCMToken],
+  ["upgradeTo", Contracts.ICVCMConstitution],
+] as const;
 
 export const parseFunctionName = (name: string): string => {
   return functionNames[name];

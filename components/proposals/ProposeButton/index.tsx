@@ -12,9 +12,7 @@ import { useUser } from "~/hooks/common";
 import { useICVCMRoles } from "~/hooks/contracts";
 import { getProposalAuthorizations } from "~/services/members";
 import CouncilMembers from "./CouncilMembers";
-import EditPrinciple from "./Principles/EditPrinciple";
 import ProposalAuthorization from "./ProposalAuthorization";
-import EditStrategy from "./StrategiesProposal/EditStrategy";
 import UpgradeContract from "./UpgradeContract";
 import VotingParameters from "./VotingParameters";
 
@@ -61,10 +59,10 @@ const ProposeButton = () => {
 
   const ProposalComponent = () => {
     switch (proposalCategory) {
-      case ProposalCategory.Principles:
-        return <EditPrinciple setOpen={setOpen} />;
-      case ProposalCategory.Strategies:
-        return <EditStrategy setOpen={setOpen} />;
+      // case ProposalCategory.Principles:
+      //   return <EditPrinciple setOpen={setOpen} />;
+      // case ProposalCategory.Strategies:
+      //   return <EditStrategy setOpen={setOpen} />;
       case ProposalCategory.CouncilMembers:
         return <CouncilMembers setOpen={setOpen} />;
       case ProposalCategory.VotingParameters:

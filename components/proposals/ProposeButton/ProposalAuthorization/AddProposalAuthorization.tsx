@@ -10,7 +10,7 @@ import {
 import { isNumber } from "lodash";
 import React, { useState } from "react";
 import useSWR from "swr";
-import { Roles } from "~/@types/Roles";
+import { Contracts, Roles } from "~/@types/Roles";
 import { useAsync } from "~/hooks/common";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposalAuthorizations } from "~/services/members";
@@ -24,8 +24,8 @@ type Props = { setOpen: (open: boolean) => void };
 
 function AddProposalAuthorization({ setOpen }: Props) {
   const [description, setDescription] = useState("");
-  const [functionName, setFunctionName] = useState("");
-  const [role, setRole] = useState(0);
+  const [functionIndex, setFunctionIndex] = useState(0);
+  const [role, setRole] = useState("");
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();
   const [_, submit] = useAsync(submitProposal);
@@ -37,9 +37,9 @@ function AddProposalAuthorization({ setOpen }: Props) {
   async function submitProposal() {
     setOpen(false);
     return proposeAddProposalAuthorization(ICVCMGovernor, description, {
-      contract: FunctionContracts[functionName],
-      function: functionName,
-      role,
+      contract: FunctionContracts[functionIndex][1],
+      function: FunctionContracts[functionIndex][0],
+      role: Number(role),
     });
   }
 
@@ -50,7 +50,7 @@ function AddProposalAuthorization({ setOpen }: Props) {
   };
 
   const handleChangeFunction = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFunctionName(event.target.value);
+    setFunctionIndex(Number(event.target.value));
   };
   const handleChangeRole = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRole(Number(event.target.value));
@@ -69,13 +69,13 @@ function AddProposalAuthorization({ setOpen }: Props) {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={functionName}
+          value={functionIndex}
           label="Proposal Type"
           onChange={handleChangeFunction}
         >
-          {Object.entries(functionNames).map(([key, value]) => (
-            <MenuItem key={key} value={key}>
-              {value}
+          {FunctionContracts.map(([key, value], index) => (
+            <MenuItem key={key} value={index.toString()}>
+              {functionNames[key]} in {Contracts[value]}
             </MenuItem>
           ))}
         </Select>
@@ -85,23 +85,27 @@ function AddProposalAuthorization({ setOpen }: Props) {
         <Select
           labelId="role-select"
           id="role"
-          value={role}
+          value={role || ""}
           label="Role"
-          disabled={!functionName}
+          disabled={functionIndex === undefined}
           onChange={handleChangeRole}
         >
-          {Object.values(Roles)
-            .filter((v) => isNumber(v))
-            .filter((v: Roles) => {
-              return !proposalAuthorizations.find(
-                (x) => x.function == functionName && x.role == v
-              );
-            })
-            .map((key) => (
-              <MenuItem key={key} value={key}>
-                {Roles[key]}
-              </MenuItem>
-            ))}
+          {functionIndex !== undefined &&
+            Object.values(Roles)
+              .filter((v) => isNumber(v))
+              .filter((v: Roles) => {
+                return !proposalAuthorizations.find(
+                  (x) =>
+                    x.function === FunctionContracts[functionIndex][0] &&
+                    x.role === v &&
+                    x.contract === FunctionContracts[functionIndex][1]
+                );
+              })
+              .map((key) => (
+                <MenuItem key={key} value={key}>
+                  {Roles[key]}
+                </MenuItem>
+              ))}
         </Select>
       </FormControl>
 

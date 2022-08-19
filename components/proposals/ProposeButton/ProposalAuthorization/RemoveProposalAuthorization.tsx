@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import useSWR from "swr";
-import { Roles } from "~/@types/Roles";
+import { Contracts, Roles } from "~/@types/Roles";
 import { useAsync } from "~/hooks/common";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
 import { getProposalAuthorizations } from "~/services/members";
@@ -76,7 +76,8 @@ function RemoveProposalAuthorization({ setOpen }: Props) {
               }
               value={i}
             >
-              {Roles[item.role]} to {parseFunctionName(item.function)}
+              {Roles[item.role]} to {parseFunctionName(item.function)} to{" "}
+              {Contracts[item.contract]}
             </MenuItem>
           ))}
         </Select>

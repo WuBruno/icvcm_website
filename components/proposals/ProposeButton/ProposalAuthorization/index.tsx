@@ -27,7 +27,7 @@ const ProposalAuthorization = ({ setOpen }: Props) => {
     return;
   }, [user, data]);
 
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState("1");
 
   const handleChange = (_, newValue: string) => {
     setValue(newValue);
