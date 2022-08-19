@@ -44,12 +44,13 @@ function ConstitutionInfo({}: Props) {
   const ICVCMRoles = useICVCMRoles();
   const ICVCMToken = useICVCMToken();
 
-  const { data: principles } = useSWR(
-    ICVCMConstitution ? "principles" : null,
+  const { data: principles, error } = useSWR(
+    ICVCMConstitution ? "getPrinciples" : null,
     async () => getPrinciples(ICVCMConstitution)
   );
+
   const { data: strategies } = useSWR(
-    ICVCMConstitution ? "strategies" : null,
+    ICVCMConstitution ? "getStrategies" : null,
     async () => getStrategies(ICVCMConstitution)
   );
   const { data: principlesHistory } = useSWR(
@@ -78,7 +79,7 @@ function ConstitutionInfo({}: Props) {
     ICVCMGovernor ? "getVotingPeriod" : null,
     async () => getVotingPeriod(ICVCMGovernor)
   );
-  const { data: settingsHistory, error } = useSWR(
+  const { data: settingsHistory } = useSWR(
     ICVCMGovernor && ICVCMRoles && ICVCMConstitution && ICVCMToken
       ? "getSettingsHistory"
       : null,
@@ -162,7 +163,7 @@ function ConstitutionInfo({}: Props) {
               <TableHead>
                 <TableRow>
                   <TableCell width={1}>ID</TableCell>
-                  <TableCell>CCP</TableCell>
+                  <TableCell>Strategy</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

@@ -701,8 +701,8 @@ export const executeProposal = async (
   );
   await tx.wait();
 
-  await mutate("principles");
-  await mutate("strategies");
+  await mutate("getPrinciples");
+  await mutate("getStrategies");
   await mutate("getProposals");
   await mutate(["getProposalExecutionEvent", proposal.proposalId]);
   await mutate(["getTotalVotesRequired", proposal.proposalId]);
