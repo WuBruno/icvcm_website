@@ -9,8 +9,8 @@ import {
 } from "~/contracts/types";
 import { TypedEvent } from "~/contracts/types/common";
 import { ICVCMConstitution } from "~/contracts/types/ICVCMConstitution";
-import { parseFunctionName, parseProposalAuthorization } from "./members";
-import { getProposal } from "./proposals";
+import { parseProposalAuthorization } from "./members";
+import { getProposal, parseFunctionName } from "./proposals";
 
 export type ConstitutionChange = {
   time: Date;
@@ -175,8 +175,6 @@ export const getSettingsHistory = async (
   const upgradeConstitutionEvents = await constitution.queryFilter(
     upgradeConstitutionFilter
   );
-
-  const governorInterface = ICVCMGovernor__factory.createInterface();
 
   const quorum = await Promise.all(
     quorumEvents.map(async (event): Promise<SettingChanges> => {

@@ -59,7 +59,7 @@ function UpgradeContract({ setOpen }: Props) {
       />
 
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Role</InputLabel>
+        <InputLabel id="demo-simple-select-label">Contract</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"

@@ -11,16 +11,12 @@ import useSWR from "swr";
 import { useUser } from "~/hooks/common";
 import { useICVCMRoles } from "~/hooks/contracts";
 import { getProposalAuthorizations } from "~/services/members";
-
-import AddMember from "./AddMember";
-import AddProposalAuthorization from "./AddProposalAuthorization";
-import EditPrinciple from "./EditPrinciple";
-import EditStrategy from "./EditStrategy";
-import RemoveMember from "./RemoveMember";
-import RemoveProposalAuthorization from "./RemoveProposalAuthorization";
+import CouncilMembers from "./CouncilMembers";
+import EditPrinciple from "./Principles/EditPrinciple";
+import ProposalAuthorization from "./ProposalAuthorization";
+import EditStrategy from "./StrategiesProposal/EditStrategy";
 import UpgradeContract from "./UpgradeContract";
-import VotingPeriod from "./VotingPeriod";
-import VotingQuorum from "./VotingQuorum";
+import VotingParameters from "./VotingParameters";
 
 const style = {
   position: "absolute" as "absolute",
@@ -34,24 +30,19 @@ const style = {
   p: 4,
 };
 
-enum ProposalType {
-  EditPrinciple,
-  EditStrategy,
-  AddMember,
-  RemoveMember,
-  VotingQuorum,
-  VotingPeriod,
-  AddProposalAuthorization,
-  RemoveProposalAuthorization,
+enum ProposalCategory {
+  Principles,
+  Strategies,
+  CouncilMembers,
+  VotingParameters,
+  ProposalAuthorization,
   UpgradeContract,
 }
 
 const ProposeButton = () => {
-  const [open, setOpen] = useState(false);
-  const [proposalType, setProposalType] = useState<ProposalType>(
-    ProposalType.EditPrinciple
-  );
   const ICVCMRoles = useICVCMRoles();
+  const [open, setOpen] = useState(false);
+  const [proposalCategory, setProposalCategory] = useState<ProposalCategory>();
   const { data } = useSWR(
     ICVCMRoles ? "getProposalAuthorizations" : null,
     async () => getProposalAuthorizations(ICVCMRoles)
@@ -64,32 +55,23 @@ const ProposeButton = () => {
     return;
   }, [user, data]);
 
-  const handleChangeProposalType = (
-    event: React.MouseEvent<HTMLElement>,
-    _proposalType: ProposalType
-  ) => {
-    setProposalType(_proposalType);
+  const handleChangeProposalType = (_, _proposalCategory: ProposalCategory) => {
+    setProposalCategory(_proposalCategory);
   };
 
   const ProposalComponent = () => {
-    switch (proposalType) {
-      case ProposalType.EditPrinciple:
+    switch (proposalCategory) {
+      case ProposalCategory.Principles:
         return <EditPrinciple setOpen={setOpen} />;
-      case ProposalType.EditStrategy:
+      case ProposalCategory.Strategies:
         return <EditStrategy setOpen={setOpen} />;
-      case ProposalType.AddMember:
-        return <AddMember setOpen={setOpen} />;
-      case ProposalType.RemoveMember:
-        return <RemoveMember setOpen={setOpen} />;
-      case ProposalType.VotingQuorum:
-        return <VotingQuorum setOpen={setOpen} />;
-      case ProposalType.VotingPeriod:
-        return <VotingPeriod setOpen={setOpen} />;
-      case ProposalType.AddProposalAuthorization:
-        return <AddProposalAuthorization setOpen={setOpen} />;
-      case ProposalType.RemoveProposalAuthorization:
-        return <RemoveProposalAuthorization setOpen={setOpen} />;
-      case ProposalType.UpgradeContract:
+      case ProposalCategory.CouncilMembers:
+        return <CouncilMembers setOpen={setOpen} />;
+      case ProposalCategory.VotingParameters:
+        return <VotingParameters setOpen={setOpen} />;
+      case ProposalCategory.ProposalAuthorization:
+        return <ProposalAuthorization setOpen={setOpen} />;
+      case ProposalCategory.UpgradeContract:
         return <UpgradeContract setOpen={setOpen} />;
 
       default:
@@ -115,62 +97,51 @@ const ProposeButton = () => {
           <ToggleButtonGroup
             color="primary"
             size="small"
-            value={proposalType}
+            value={proposalCategory}
             exclusive
             onChange={handleChangeProposalType}
           >
             <ToggleButton
-              value={ProposalType.EditPrinciple}
+              value={ProposalCategory.Principles}
               disabled={!authorizations?.includes("setPrinciples")}
             >
               Carbon Credit Principles
             </ToggleButton>
             <ToggleButton
-              value={ProposalType.EditStrategy}
+              value={ProposalCategory.Strategies}
               disabled={!authorizations?.includes("setStrategies")}
             >
               Strategic Decisions
             </ToggleButton>
             <ToggleButton
-              value={ProposalType.AddMember}
-              disabled={!authorizations?.includes("addMember")}
-            >
-              Add Member
-            </ToggleButton>
-            <ToggleButton
-              value={ProposalType.RemoveMember}
-              disabled={!authorizations?.includes("removeMember")}
-            >
-              Remove Member
-            </ToggleButton>
-            <ToggleButton
-              value={ProposalType.VotingQuorum}
-              disabled={!authorizations?.includes("updateQuorumNumerator")}
-            >
-              Voting Quorum
-            </ToggleButton>
-            <ToggleButton
-              value={ProposalType.VotingPeriod}
-              disabled={!authorizations?.includes("setVotingPeriod")}
-            >
-              Voting Period
-            </ToggleButton>
-            <ToggleButton
-              value={ProposalType.AddProposalAuthorization}
-              disabled={!authorizations?.includes("addProposalAuthorization")}
-            >
-              Add Proposal Authorization
-            </ToggleButton>
-            <ToggleButton
-              value={ProposalType.RemoveProposalAuthorization}
+              value={ProposalCategory.CouncilMembers}
               disabled={
+                !authorizations?.includes("addMember") &&
+                !authorizations?.includes("removeMember")
+              }
+            >
+              Council Members
+            </ToggleButton>
+            <ToggleButton
+              value={ProposalCategory.VotingParameters}
+              disabled={
+                !authorizations?.includes("updateQuorumNumerator") &&
+                !authorizations?.includes("setVotingPeriod")
+              }
+            >
+              Voting Parameters
+            </ToggleButton>
+            <ToggleButton
+              value={ProposalCategory.ProposalAuthorization}
+              disabled={
+                !authorizations?.includes("addProposalAuthorization") &&
                 !authorizations?.includes("removeProposalAuthorization")
               }
             >
-              Remove Proposal Authorization
+              Proposal Authorization
             </ToggleButton>
             <ToggleButton
-              value={ProposalType.UpgradeContract}
+              value={ProposalCategory.UpgradeContract}
               disabled={!authorizations?.includes("upgradeTo")}
             >
               Upgrade Contract

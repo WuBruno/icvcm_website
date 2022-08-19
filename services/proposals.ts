@@ -625,3 +625,31 @@ export const getVotingPeriod = async (ICVCMGovernor: ICVCMGovernor) => {
   const blocks = await ICVCMGovernor.votingPeriod();
   return parseBlockToDays(blocks.toNumber());
 };
+
+export const functionNames = {
+  addMember: "Add Member",
+  removeMember: "Remove Member",
+  setPrinciples: "Edit Principles",
+  setStrategies: "Edit Strategies",
+  updateQuorumNumerator: "Set Voting Quorum",
+  setVotingPeriod: "Set Voting Period",
+  addProposalAuthorization: "Add Proposal Authorization",
+  removeProposalAuthorization: "Remove Proposal Authorization",
+  upgradeTo: "Upgrade Contract",
+};
+
+export const FunctionContracts = {
+  addMember: Contracts.ICVCMRoles,
+  removeMember: Contracts.ICVCMRoles,
+  setPrinciples: Contracts.ICVCMConstitution,
+  setStrategies: Contracts.ICVCMConstitution,
+  updateQuorumNumerator: Contracts.ICVCMGovernor,
+  setVotingPeriod: Contracts.ICVCMGovernor,
+  addProposalAuthorization: Contracts.ICVCMRoles,
+  removeProposalAuthorization: Contracts.ICVCMRoles,
+  upgradeTo: Contracts.ICVCMGovernor,
+};
+
+export const parseFunctionName = (name: string): string => {
+  return functionNames[name];
+};

@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { Proposal } from "~/@types";
 import { Contracts, Roles } from "~/@types/Roles";
-import { parseFunctionName } from "~/services/members";
+import { parseFunctionName } from "~/services/proposals";
 import { parseBlockToDays } from "~/util";
 import ProposalHistory from "./ProposalHistory";
 

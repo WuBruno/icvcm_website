@@ -13,12 +13,12 @@ import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
 import { useAsync } from "~/hooks/common";
 import { useICVCMGovernor, useICVCMRoles } from "~/hooks/contracts";
+import { getProposalAuthorizations } from "~/services/members";
 import {
   FunctionContracts,
   functionNames,
-  getProposalAuthorizations,
-} from "~/services/members";
-import { proposeAddProposalAuthorization } from "~/services/proposals";
+  proposeAddProposalAuthorization,
+} from "~/services/proposals";
 
 type Props = { setOpen: (open: boolean) => void };
 

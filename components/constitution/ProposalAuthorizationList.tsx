@@ -12,10 +12,8 @@ import { useMemo } from "react";
 import useSWR from "swr";
 import { Roles } from "~/@types/Roles";
 import { useICVCMRoles } from "~/hooks/contracts";
-import {
-  getProposalAuthorizations,
-  parseFunctionName,
-} from "~/services/members";
+import { getProposalAuthorizations } from "~/services/members";
+import { parseFunctionName } from "~/services/proposals";
 
 type Props = {};
 
