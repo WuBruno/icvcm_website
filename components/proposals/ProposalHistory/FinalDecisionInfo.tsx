@@ -1,7 +1,9 @@
-import { ListItemText } from "@mui/material";
+import { AccessTimeOutlined } from "@mui/icons-material";
+import { ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import { Proposal, ProposalState } from "~/@types";
 import ProposalCancelInfo from "./ProposalCancelInfo";
 import ProposalExecutedInfo from "./ProposalExecutedInfo";
+import SupportIcon from "./SupportIcon";
 
 type FinalDecisionInfoProps = {
   proposal: Proposal;
@@ -17,18 +19,28 @@ const FinalDecisionInfo = ({ proposal }: FinalDecisionInfoProps) => {
 
     case ProposalState.Succeeded:
       return (
-        <ListItemText
-          primary="Voting Succeeded"
-          secondary="Waiting for Regulator's Final Decision"
-        />
+        <ListItem>
+          <ListItemAvatar sx={{ marginRight: -2 }}>
+            <AccessTimeOutlined />
+          </ListItemAvatar>
+          <ListItemText
+            primary="Voting Succeeded"
+            secondary="Waiting for Regulator's Final Decision"
+          />
+        </ListItem>
       );
 
     case ProposalState.Defeated:
       return (
-        <ListItemText
-          primary="Proposal Defeated"
-          secondary="Consensus against the proposal"
-        />
+        <ListItem>
+          <ListItemAvatar sx={{ marginRight: -2 }}>
+            <SupportIcon support={VoteSupport.Against} />
+          </ListItemAvatar>
+          <ListItemText
+            primary="Proposal Defeated"
+            secondary="Consensus against the proposal"
+          />
+        </ListItem>
       );
 
     case ProposalState.Expired:

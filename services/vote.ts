@@ -34,6 +34,7 @@ export const getVote = async (
     proposalId,
     support: proposal.args.support,
     time: new Date(block.timestamp * 1e3),
+    reason: proposal.args.reason,
   };
 };
 
@@ -57,6 +58,7 @@ export const getVotes = async (
         voter: member,
         support: vote.args.support,
         time: new Date(block.timestamp * 1e3),
+        reason: vote.args.reason,
       };
     })
   );
@@ -65,9 +67,14 @@ export const getVotes = async (
 export const castVote = async (
   ICVCMGovernor: ICVCMGovernor,
   proposalId: string,
-  support: VoteSupport
+  support: VoteSupport,
+  reason = ""
 ) => {
-  const voteTx = await ICVCMGovernor.castVote(proposalId, support);
+  const voteTx = await ICVCMGovernor.castVoteWithReason(
+    proposalId,
+    support,
+    reason
+  );
   const signerAddress = await ICVCMGovernor.signer.getAddress();
 
   await voteTx.wait();

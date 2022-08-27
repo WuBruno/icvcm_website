@@ -677,7 +677,8 @@ export const getProposalCancelEvent = async (
   proposalId: string
 ) => {
   const filter = ICVCMGovernor.filters.ProposalCanceled(
-    ethers.BigNumber.from(proposalId)
+    ethers.BigNumber.from(proposalId),
+    null
   );
   const result = await ICVCMGovernor.queryFilter(filter);
 
@@ -686,7 +687,7 @@ export const getProposalCancelEvent = async (
   }
   const block = await result[0].getBlock();
 
-  return new Date(block.timestamp * 1e3);
+  return [new Date(block.timestamp * 1e3), result[0].args.reason] as const;
 };
 
 export const executeProposal = async (
@@ -718,13 +719,15 @@ export const executeProposal = async (
 
 export const cancelProposal = async (
   ICVCMGovernor: ICVCMGovernor,
-  proposal: Proposal
+  proposal: Proposal,
+  reason: string
 ) => {
   const tx = await ICVCMGovernor.cancel(
     proposal.targets,
     [0],
     proposal.calldatas,
-    ethers.utils.id(proposal.description)
+    ethers.utils.id(proposal.description),
+    reason
   );
   await tx.wait();
 

@@ -11,6 +11,7 @@ export type Vote = {
   proposalId: BigNumberish;
   support: VoteSupport;
   time: Date;
+  reason?: string;
 };
 
 export type MemberVote = Vote & {

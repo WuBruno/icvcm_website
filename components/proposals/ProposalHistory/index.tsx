@@ -38,7 +38,7 @@ const ProposalHistory = ({ proposal }: Props) => {
   const ICVCMGovernor = useICVCMGovernor();
   const ICVCMRoles = useICVCMRoles();
   const ICVCMToken = useICVCMToken();
-  const { data: votes } = useSWR(["getVote", proposal.proposalId], async () =>
+  const { data: votes } = useSWR(["getVotes", proposal.proposalId], async () =>
     getVotes(ICVCMGovernor, ICVCMRoles, proposal.proposalId)
   );
   const { data: votesRequired } = useSWR(
@@ -116,7 +116,10 @@ const ProposalHistory = ({ proposal }: Props) => {
                       primary={`${vote.voter.name} has voted ${
                         VoteSupport[vote.support]
                       }`}
-                      secondary={vote.time.toLocaleString()}
+                      secondary={
+                        vote.time.toLocaleString() +
+                        (vote.reason ? ` - Comment: ${vote.reason}` : "")
+                      }
                     />
                   </ListItem>
                 ))}

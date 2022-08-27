@@ -319,7 +319,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "strategyId",
+        "name": "id",
         "type": "uint256"
       }
     ],

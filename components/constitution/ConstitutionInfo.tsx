@@ -44,7 +44,7 @@ function ConstitutionInfo({}: Props) {
   const ICVCMRoles = useICVCMRoles();
   const ICVCMToken = useICVCMToken();
 
-  const { data: principles, error } = useSWR(
+  const { data: principles } = useSWR(
     ICVCMConstitution ? "getPrinciples" : null,
     async () => getPrinciples(ICVCMConstitution)
   );
@@ -79,6 +79,7 @@ function ConstitutionInfo({}: Props) {
     ICVCMGovernor ? "getVotingPeriod" : null,
     async () => getVotingPeriod(ICVCMGovernor)
   );
+
   const { data: settingsHistory } = useSWR(
     ICVCMGovernor && ICVCMRoles && ICVCMConstitution && ICVCMToken
       ? "getSettingsHistory"

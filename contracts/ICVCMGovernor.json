@@ -75,6 +75,12 @@
         "internalType": "uint256",
         "name": "proposalId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
       }
     ],
     "name": "ProposalCanceled",
@@ -383,6 +389,11 @@
         "internalType": "bytes32",
         "name": "descriptionHash",
         "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
       }
     ],
     "name": "cancel",
@@ -745,7 +756,7 @@
       },
       {
         "internalType": "contract ICVCMRoles",
-        "name": "_roles",
+        "name": "roles",
         "type": "address"
       }
     ],
